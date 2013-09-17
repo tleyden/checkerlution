@@ -61,8 +61,9 @@ func (game *Game) GameLoop() {
 
 func (game *Game) FetchNewGameDocument() (gameState []float64, possibleMoves [][]float64) {
 	gameState = make([]float64, 32)
-	possibleMove := make([]float64, 5)
-	possibleMoves = [][]float64{possibleMove}
+	possibleMove1 := []float64{0, 0.5, -1.0, 1.0, -0.5}
+	possibleMove2 := []float64{1.0, -0.5, 0, 0.5, -1.0}
+	possibleMoves = [][]float64{possibleMove1, possibleMove2}
 	return
 }
 
