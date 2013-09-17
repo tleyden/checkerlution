@@ -11,4 +11,7 @@ func TestCreateNeurgoCortex(t *testing.T) {
 	cortex := game.cortex
 	assert.True(t, cortex != nil)
 	assert.True(t, cortex.Sensors != nil)
+
+	cortex.RenderSVGFile("out.svg")
+
 }
