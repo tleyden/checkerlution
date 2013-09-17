@@ -3,6 +3,7 @@ package checkerlution
 import (
 	"github.com/couchbaselabs/go.assert"
 	"github.com/couchbaselabs/logg"
+	ng "github.com/tleyden/neurgo"
 	"testing"
 )
 
@@ -18,6 +19,7 @@ func TestCreateNeurgoCortex(t *testing.T) {
 }
 
 func TestGameLoop(t *testing.T) {
+	ng.SeedRandom()
 	logg.LogKeys["MAIN"] = true
 	game := &Game{}
 	game.GameLoop()
