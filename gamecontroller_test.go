@@ -2,6 +2,7 @@ package checkerlution
 
 import (
 	"github.com/couchbaselabs/go.assert"
+	"github.com/couchbaselabs/logg"
 	"testing"
 )
 
@@ -13,5 +14,12 @@ func TestCreateNeurgoCortex(t *testing.T) {
 	assert.True(t, cortex.Sensors != nil)
 
 	cortex.RenderSVGFile("out.svg")
+
+}
+
+func TestGameLoop(t *testing.T) {
+	logg.LogKeys["MAIN"] = true
+	game := &Game{}
+	game.GameLoop()
 
 }

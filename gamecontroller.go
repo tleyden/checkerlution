@@ -12,6 +12,64 @@ type Game struct {
 	latestActuatorOutput []float64
 }
 
+func (game *Game) GameLoop() {
+
+	// get a neurgo network
+	game.CreateNeurgoCortex()
+	game.cortex.Run()
+
+	for {
+
+		// fetch game state and list of available moves from game server
+		gameState, possibleMoves := game.FetchNewGameDocument()
+		game.currentGameState = gameState
+		logg.LogTo("MAIN", "gameState: %v", gameState)
+
+		var bestMove []float64
+		var bestMoveRating []float64
+		bestMove = make([]float64, 5)
+		bestMoveRating = []float64{-1000000000}
+
+		for _, possibleMove := range possibleMoves {
+
+			logg.LogTo("MAIN", "possible move: %v", possibleMove)
+
+			// present it to the neural net
+			game.currentPossibleMove = possibleMove
+			game.cortex.SyncSensors()
+			game.cortex.SyncActuators()
+
+			logg.LogTo("MAIN", "done sync'ing actuators")
+
+			logg.LogTo("MAIN", "actuator output %v bestMoveRating: %v", game.latestActuatorOutput[0], bestMoveRating[0])
+			if game.latestActuatorOutput[0] > bestMoveRating[0] {
+				logg.LogTo("MAIN", "actuator output > bestMoveRating")
+				bestMove = possibleMove
+				bestMoveRating[0] = game.latestActuatorOutput[0]
+			} else {
+				logg.LogTo("MAIN", "actuator output < bestMoveRating, ignoring")
+			}
+
+		}
+
+		// post the chosen move to server
+		game.PostChosenMove(bestMove)
+
+	}
+
+}
+
+func (game *Game) FetchNewGameDocument() (gameState []float64, possibleMoves [][]float64) {
+	gameState = make([]float64, 32)
+	possibleMove := make([]float64, 5)
+	possibleMoves = [][]float64{possibleMove}
+	return
+}
+
+func (game *Game) PostChosenMove(move []float64) {
+	logg.LogTo("MAIN", "chosen move: %v", move)
+}
+
 func (game *Game) CreateNeurgoCortex() {
 
 	nodeId := ng.NewCortexId("cortex")
@@ -62,7 +120,9 @@ func (game *Game) CreateActuator() {
 
 	actuatorNodeId := ng.NewActuatorId("Actuator", 0.5)
 	actuatorFunc := func(outputs []float64) {
+		logg.LogTo("MAIN", "actuator func called with: %v", outputs)
 		game.latestActuatorOutput = outputs
+		game.cortex.SyncChan <- actuatorNodeId // TODO: this should be in actuator itself, not in this function
 	}
 	actuator := &ng.Actuator{
 		NodeId:           actuatorNodeId,
@@ -78,6 +138,7 @@ func (game *Game) CreateSensors() {
 	sensorLayer := 0.0
 
 	sensorFuncGameState := func(syncCounter int) []float64 {
+		logg.LogTo("MAIN", "sensor func game state called")
 		return game.currentGameState
 	}
 	sensorGameStateNodeId := ng.NewSensorId("SensorGameState", sensorLayer)
@@ -88,6 +149,7 @@ func (game *Game) CreateSensors() {
 	}
 
 	sensorFuncPossibleMove := func(syncCounter int) []float64 {
+		logg.LogTo("MAIN", "sensor func possible move called")
 		return game.currentPossibleMove
 	}
 	sensorPossibleMoveNodeId := ng.NewSensorId("SensorPossibleMove", sensorLayer)
@@ -97,31 +159,5 @@ func (game *Game) CreateSensors() {
 		SensorFunction: sensorFuncPossibleMove,
 	}
 	game.cortex.SetSensors([]*ng.Sensor{sensorGameState, sensorPossibleMove})
-
-}
-
-func (game *Game) GameLoop() {
-
-	// get a neurgo network
-	game.CreateNeurgoCortex()
-	logg.LogTo("DEBUG", "game: %v", game)
-
-	for {
-		// read a new Game document via http
-
-		// extract game state and list of available moves
-
-		// for each available move:
-
-		// present it to the neural net by saving in game
-		// and calling cortex.SyncSensors
-
-		// read response from actuator and store
-
-		// post the chosen move onto a channel
-
-		break
-
-	}
 
 }
