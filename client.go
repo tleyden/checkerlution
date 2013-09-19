@@ -14,7 +14,7 @@ type GenericMap map[string]interface{}
 type Client struct {
 }
 
-func (client Client) FetchChangesFeed() (data GenericMap) {
+func (client Client) fetchChangesFeed() (data GenericMap) {
 
 	url := CHANGES_FEED_URL
 	resp, fetch_err := http.Get(url)
@@ -37,11 +37,19 @@ func (client Client) FetchChangesFeed() (data GenericMap) {
 	return
 }
 
-func (client Client) FetchNewGameDocument() (gameState []float64, possibleMoves []Move) {
+func (client Client) extractGameRevision(changesFeedMap GenericMap) (gameRev string) {
 
-	changesFeedMap := client.FetchChangesFeed()
 	results := changesFeedMap["results"]
 	logg.LogTo("MAIN", "results: %v", results)
+	return
+
+}
+
+func (client Client) FetchNewGameDocument() (gameState []float64, possibleMoves []Move) {
+
+	changesFeedMap := client.fetchChangesFeed()
+	gameRev := client.extractGameRevision(changesFeedMap)
+	logg.LogTo("MAIN", "gameRev: %v", gameRev)
 
 	// TODO: this should be
 	// - pulled from server
