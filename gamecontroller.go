@@ -25,17 +25,17 @@ func (game *Game) GameLoop() {
 		game.currentGameState = gameState
 		logg.LogTo("MAIN", "gameState: %v", gameState)
 
-		var bestMove []float64
+		var bestMove Move
 		var bestMoveRating []float64
-		bestMove = make([]float64, 5)
 		bestMoveRating = []float64{-1000000000}
 
-		for _, possibleMove := range possibleMoves {
+		for _, move := range possibleMoves {
 
-			logg.LogTo("MAIN", "possible move: %v", possibleMove)
+			logg.LogTo("MAIN", "possible move: %v", move)
 
 			// present it to the neural net
-			game.currentPossibleMove = possibleMove
+			moveVector := move.VectorRepresentation()
+			game.currentPossibleMove = moveVector
 			game.cortex.SyncSensors()
 			game.cortex.SyncActuators()
 
@@ -44,7 +44,7 @@ func (game *Game) GameLoop() {
 			logg.LogTo("MAIN", "actuator output %v bestMoveRating: %v", game.latestActuatorOutput[0], bestMoveRating[0])
 			if game.latestActuatorOutput[0] > bestMoveRating[0] {
 				logg.LogTo("MAIN", "actuator output > bestMoveRating")
-				bestMove = possibleMove
+				bestMove = move
 				bestMoveRating[0] = game.latestActuatorOutput[0]
 			} else {
 				logg.LogTo("MAIN", "actuator output < bestMoveRating, ignoring")
@@ -59,15 +59,31 @@ func (game *Game) GameLoop() {
 
 }
 
-func (game *Game) FetchNewGameDocument() (gameState []float64, possibleMoves [][]float64) {
+func (game *Game) FetchNewGameDocument() (gameState []float64, possibleMoves []Move) {
+
 	gameState = make([]float64, 32)
-	possibleMove1 := []float64{0, 0.5, -1.0, 1.0, -0.5}
-	possibleMove2 := []float64{1.0, -0.5, 0, 0.5, -1.0}
-	possibleMoves = [][]float64{possibleMove1, possibleMove2}
+
+	possibleMove1 := Move{
+		startLocation:   0,
+		isCurrentlyKing: -1,
+		endLocation:     1.0,
+		willBecomeKing:  -0.5,
+		captureValue:    1,
+	}
+
+	possibleMove2 := Move{
+		startLocation:   1,
+		isCurrentlyKing: -0.5,
+		endLocation:     0.0,
+		willBecomeKing:  0.5,
+		captureValue:    0,
+	}
+
+	possibleMoves = []Move{possibleMove1, possibleMove2}
 	return
 }
 
-func (game *Game) PostChosenMove(move []float64) {
+func (game *Game) PostChosenMove(move Move) {
 	logg.LogTo("MAIN", "chosen move: %v", move)
 }
 

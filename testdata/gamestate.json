@@ -1,0 +1,488 @@
+{
+    "_id": "game:checkers",
+    "_rev": "24187-977a6282c88471022c22c1a7c9256ab7",
+    "_revisions": {
+        "ids": ["977a6282c88471022c22c1a7c9256ab7"],
+        "start": 24187
+    },
+    "activeTeam": 0,
+    "channels": ["game"],
+    "moveDeadline": "2013-09-18T14:17:11Z",
+    "moveInterval": 30,
+    "moves": [{
+        "game": 263655,
+        "locations": [9, 14],
+        "piece": 8,
+        "team": 0,
+        "turn": 1
+    }, {
+        "game": 263655,
+        "locations": [23, 18],
+        "piece": 2,
+        "team": 1,
+        "turn": 2
+    }, {
+        "game": 263655,
+        "locations": [14, 23],
+        "piece": 8,
+        "team": 0,
+        "turn": 3
+    }, {
+        "game": 263655,
+        "locations": [27, 18],
+        "piece": 6,
+        "team": 1,
+        "turn": 4
+    }, {
+        "game": 263655,
+        "locations": [10, 15],
+        "piece": 9,
+        "team": 0,
+        "turn": 5
+    }, {
+        "game": 263655,
+        "locations": [21, 17],
+        "piece": 0,
+        "team": 1,
+        "turn": 6
+    }, {
+        "game": 263655,
+        "locations": [15, 19],
+        "piece": 9,
+        "team": 0,
+        "turn": 7
+    }, {
+        "game": 263655,
+        "locations": [24, 15],
+        "piece": 3,
+        "team": 1,
+        "turn": 8
+    }, {
+        "game": 263655,
+        "locations": [12, 16],
+        "piece": 11,
+        "team": 0,
+        "turn": 9
+    }, {
+        "game": 263655,
+        "locations": [32, 27],
+        "piece": 11,
+        "team": 1,
+        "turn": 10
+    }, {
+        "game": 263655,
+        "locations": [16, 20],
+        "piece": 11,
+        "team": 0,
+        "turn": 11
+    }, {
+        "game": 263655,
+        "locations": [28, 24],
+        "piece": 7,
+        "team": 1,
+        "turn": 12
+    }, {
+        "game": 263655,
+        "locations": [7, 10],
+        "piece": 6,
+        "team": 0,
+        "turn": 13
+    }, {
+        "game": 263655,
+        "locations": [24, 19],
+        "piece": 7,
+        "team": 1,
+        "turn": 14
+    }, {
+        "game": 263655,
+        "locations": [20, 24],
+        "piece": 11,
+        "team": 0,
+        "turn": 15
+    }, {
+        "game": 263655,
+        "locations": [27, 20],
+        "piece": 11,
+        "team": 1,
+        "turn": 16
+    }, {
+        "game": 263655,
+        "locations": [2, 7],
+        "piece": 1,
+        "team": 0,
+        "turn": 17
+    }, {
+        "game": 263655,
+        "locations": [20, 16],
+        "piece": 11,
+        "team": 1,
+        "turn": 18
+    }, {
+        "game": 263655,
+        "locations": [11, 20],
+        "piece": 10,
+        "team": 0,
+        "turn": 19
+    }, {
+        "game": 263655,
+        "locations": [17, 13],
+        "piece": 0,
+        "team": 1,
+        "turn": 20
+    }, {
+        "game": 263655,
+        "locations": [6, 9],
+        "piece": 5,
+        "team": 0,
+        "turn": 21
+    }, {
+        "game": 263655,
+        "locations": [15, 6],
+        "piece": 3,
+        "team": 1,
+        "turn": 22
+    }, {
+        "game": 263655,
+        "locations": [1, 10],
+        "piece": 0,
+        "team": 0,
+        "turn": 23
+    }, {
+        "game": 263655,
+        "locations": [13, 6],
+        "piece": 0,
+        "team": 1,
+        "turn": 24
+    }, {
+        "game": 263655,
+        "locations": [10, 15],
+        "piece": 0,
+        "team": 0,
+        "turn": 25
+    }, {
+        "game": 263655,
+        "locations": [19, 10],
+        "piece": 7,
+        "team": 1,
+        "turn": 26
+    }, {
+        "game": 263655,
+        "locations": [7, 14, 23],
+        "piece": 1,
+        "team": 0,
+        "turn": 27
+    }, {
+        "game": 263655,
+        "locations": [26, 19],
+        "piece": 5,
+        "team": 1,
+        "turn": 28
+    }, {
+        "game": 263655,
+        "locations": [20, 24],
+        "piece": 10,
+        "team": 0,
+        "turn": 29
+    }, {
+        "game": 263655,
+        "locations": [22, 18],
+        "piece": 1,
+        "team": 1,
+        "turn": 30
+    }, {
+        "game": 263655,
+        "locations": [24, 28],
+        "piece": 10,
+        "team": 0,
+        "turn": 31
+    }, {
+        "game": 263655,
+        "locations": [6, 2],
+        "piece": 0,
+        "team": 1,
+        "turn": 32
+    }, {
+        "game": 263655,
+        "locations": [28, 32],
+        "piece": 10,
+        "team": 0,
+        "turn": 33
+    }, {
+        "game": 263655,
+        "locations": [31, 26],
+        "piece": 10,
+        "team": 1,
+        "turn": 34
+    }, {
+        "game": 263655,
+        "locations": [5, 9],
+        "piece": 4,
+        "team": 0,
+        "turn": 35
+    }, {
+        "game": 263655,
+        "locations": [18, 15],
+        "piece": 1,
+        "team": 1,
+        "turn": 36
+    }, {
+        "game": 263655,
+        "locations": [3, 7],
+        "piece": 2,
+        "team": 0,
+        "turn": 37
+    }, {
+        "game": 263655,
+        "locations": [2, 11],
+        "piece": 0,
+        "team": 1,
+        "turn": 38
+    }, {
+        "game": 263655,
+        "locations": [9, 14],
+        "piece": 4,
+        "team": 0,
+        "turn": 39
+    }, {
+        "game": 263655,
+        "locations": [15, 10],
+        "piece": 1,
+        "team": 1,
+        "turn": 40
+    }, {
+        "game": 263655,
+        "locations": [8, 15, 24],
+        "piece": 7,
+        "team": 0,
+        "turn": 41
+    }, {
+        "game": 263655,
+        "locations": [10, 7],
+        "piece": 1,
+        "team": 1,
+        "turn": 42
+    }, {
+        "game": 263655,
+        "locations": [14, 18],
+        "piece": 4,
+        "team": 0,
+        "turn": 43
+    }, {
+        "game": 263655,
+        "locations": [25, 22],
+        "piece": 4,
+        "team": 1,
+        "turn": 44
+    }, {
+        "game": 263655,
+        "locations": [18, 25],
+        "piece": 4,
+        "team": 0,
+        "turn": 45
+    }, {
+        "game": 263655,
+        "locations": [30, 21],
+        "piece": 9,
+        "team": 1,
+        "turn": 46
+    }, {
+        "game": 263655,
+        "locations": [32, 28],
+        "piece": 10,
+        "team": 0,
+        "turn": 47
+    }, {
+        "game": 263655,
+        "locations": [26, 23],
+        "piece": 10,
+        "team": 1,
+        "turn": 48
+    }, {
+        "game": 263655,
+        "locations": [24, 27],
+        "piece": 7,
+        "team": 0,
+        "turn": 49
+    }, {
+        "game": 263655,
+        "locations": [23, 19],
+        "piece": 10,
+        "team": 1,
+        "turn": 50
+    }, {
+        "game": 263655,
+        "locations": [27, 31],
+        "piece": 7,
+        "team": 0,
+        "turn": 51
+    }, {
+        "game": 263655,
+        "locations": [19, 16],
+        "piece": 10,
+        "team": 1,
+        "turn": 52
+    }, {
+        "game": 263655,
+        "locations": [4, 8],
+        "piece": 3,
+        "team": 0,
+        "turn": 53
+    }, {
+        "game": 263655,
+        "locations": [21, 17],
+        "piece": 9,
+        "team": 1,
+        "turn": 54
+    }, {
+        "game": 263655,
+        "locations": [8, 11],
+        "piece": 3,
+        "team": 0,
+        "turn": 55
+    }, {
+        "game": 263655,
+        "locations": [17, 13],
+        "piece": 9,
+        "team": 1,
+        "turn": 56
+    }, {
+        "game": 263655,
+        "locations": [11, 20],
+        "piece": 3,
+        "team": 0,
+        "turn": 57
+    }, {
+        "game": 263655,
+        "locations": [29, 25],
+        "piece": 8,
+        "team": 1,
+        "turn": 58
+    }, {
+        "game": 263655,
+        "locations": [31, 27],
+        "piece": 7,
+        "team": 0,
+        "turn": 59
+    }, {
+        "game": 263655,
+        "locations": [7, 2],
+        "piece": 1,
+        "team": 1,
+        "turn": 60
+    }, {
+        "game": 263655,
+        "locations": [27, 32],
+        "piece": 7,
+        "team": 0,
+        "turn": 61
+    }, {
+        "game": 263655,
+        "locations": [25, 22],
+        "piece": 8,
+        "team": 1,
+        "turn": 62
+    }, {
+        "game": 263655,
+        "locations": [20, 24],
+        "piece": 3,
+        "team": 0,
+        "turn": 63
+    }, {
+        "game": 263655,
+        "locations": [22, 18],
+        "piece": 8,
+        "team": 1,
+        "turn": 64
+    }],
+    "number": 263655,
+    "startTime": "2013-09-17T18:46:01Z",
+    "teams": [{
+        "participantCount": 22,
+        "pieces": [{
+            "captured": true,
+            "location": 15
+        }, {
+            "captured": true,
+            "location": 23
+        }, {
+            "captured": true,
+            "location": 7
+        }, {
+            "location": 24,
+            "validMoves": [{
+                "captures": [],
+                "king": false,
+                "locations": [27]
+            }]
+        }, {
+            "captured": true,
+            "location": 25
+        }, {
+            "captured": true,
+            "location": 9
+        }, {
+            "captured": true,
+            "location": 10
+        }, {
+            "king": true,
+            "location": 32,
+            "validMoves": [{
+                "captures": [],
+                "king": false,
+                "locations": [27]
+            }]
+        }, {
+            "captured": true,
+            "location": 23
+        }, {
+            "captured": true,
+            "location": 19
+        }, {
+            "king": true,
+            "location": 28
+        }, {
+            "captured": true,
+            "location": 24
+        }]
+    }, {
+        "participantCount": 28,
+        "pieces": [{
+            "captured": true,
+            "king": true,
+            "location": 11
+        }, {
+            "king": true,
+            "location": 2
+        }, {
+            "captured": true,
+            "location": 18
+        }, {
+            "captured": true,
+            "location": 6
+        }, {
+            "captured": true,
+            "location": 22
+        }, {
+            "captured": true,
+            "location": 19
+        }, {
+            "captured": true,
+            "location": 18
+        }, {
+            "captured": true,
+            "location": 10
+        }, {
+            "location": 18
+        }, {
+            "location": 13
+        }, {
+            "captured": true,
+            "location": 16
+        }, {
+            "captured": true,
+            "location": 16
+        }]
+    }],
+    "turn": 65,
+    "votesDoc": "votes:checkers"
+}
