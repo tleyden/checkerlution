@@ -12,6 +12,33 @@ type Game struct {
 	latestActuatorOutput []float64
 }
 
+func (game *Game) GameLoop() {
+
+	client := Client{}
+
+	// get a neurgo network
+	game.CreateNeurgoCortex()
+	cortex := game.cortex
+
+	cortex.Run()
+
+	for {
+
+		// fetch game state and list of available moves from game server
+		gameState, possibleMoves := client.FetchNewGameDocument()
+
+		bestMove := game.ChooseBestMove(gameState, possibleMoves)
+
+		game.PostChosenMove(bestMove)
+
+		// when do we break out of the loop??
+
+	}
+
+	game.cortex.Shutdown()
+
+}
+
 func (game *Game) ChooseBestMove(gameState []float64, possibleMoves []Move) (bestMove Move) {
 
 	game.currentGameState = gameState
@@ -43,60 +70,6 @@ func (game *Game) ChooseBestMove(gameState []float64, possibleMoves []Move) (bes
 	}
 	return
 
-}
-
-func (game *Game) GameLoop() {
-
-	// get a neurgo network
-	game.CreateNeurgoCortex()
-	cortex := game.cortex
-
-	cortex.Run()
-
-	for {
-
-		// fetch game state and list of available moves from game server
-		gameState, possibleMoves := game.FetchNewGameDocument()
-
-		bestMove := game.ChooseBestMove(gameState, possibleMoves)
-
-		game.PostChosenMove(bestMove)
-
-		// when do we break out of the loop??
-
-	}
-
-	game.cortex.Shutdown()
-
-}
-
-func (game *Game) FetchNewGameDocument() (gameState []float64, possibleMoves []Move) {
-
-	// TODO: this should be
-	// - pulled from server
-	// - parsed into json
-	// - data structs should be extracted from json
-
-	gameState = make([]float64, 32)
-
-	possibleMove1 := Move{
-		startLocation:   0,
-		isCurrentlyKing: -1,
-		endLocation:     1.0,
-		willBecomeKing:  -0.5,
-		captureValue:    1,
-	}
-
-	possibleMove2 := Move{
-		startLocation:   1,
-		isCurrentlyKing: -0.5,
-		endLocation:     0.0,
-		willBecomeKing:  0.5,
-		captureValue:    0,
-	}
-
-	possibleMoves = []Move{possibleMove1, possibleMove2}
-	return
 }
 
 func (game *Game) PostChosenMove(move Move) {
