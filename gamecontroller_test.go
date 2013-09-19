@@ -18,6 +18,31 @@ func TestCreateNeurgoCortex(t *testing.T) {
 
 }
 
+func FakeGameDocument() (gameState []float64, possibleMoves []Move) {
+
+	gameState = make([]float64, 32)
+
+	possibleMove1 := Move{
+		startLocation:   0,
+		isCurrentlyKing: -1,
+		endLocation:     1.0,
+		willBecomeKing:  -0.5,
+		captureValue:    1,
+	}
+
+	possibleMove2 := Move{
+		startLocation:   1,
+		isCurrentlyKing: -0.5,
+		endLocation:     0.0,
+		willBecomeKing:  0.5,
+		captureValue:    0,
+	}
+
+	possibleMoves = []Move{possibleMove1, possibleMove2}
+	return
+
+}
+
 func TestChooseBestMove(t *testing.T) {
 
 	ng.SeedRandom()
@@ -28,7 +53,7 @@ func TestChooseBestMove(t *testing.T) {
 	cortex := game.cortex
 	cortex.Run()
 
-	gameState, possibleMoves := game.FetchNewGameDocument()
+	gameState, possibleMoves := FakeGameDocument()
 	bestMove := game.ChooseBestMove(cortex, gameState, possibleMoves)
 
 	found := false
