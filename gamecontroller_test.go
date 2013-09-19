@@ -54,7 +54,7 @@ func TestChooseBestMove(t *testing.T) {
 	cortex.Run()
 
 	gameState, possibleMoves := FakeGameDocument()
-	bestMove := game.ChooseBestMove(cortex, gameState, possibleMoves)
+	bestMove := game.ChooseBestMove(gameState, possibleMoves)
 
 	found := false
 	for _, possibleMove := range possibleMoves {

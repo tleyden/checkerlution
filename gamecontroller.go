@@ -12,7 +12,7 @@ type Game struct {
 	latestActuatorOutput []float64
 }
 
-func (game *Game) ChooseBestMove(cortex *ng.Cortex, gameState []float64, possibleMoves []Move) (bestMove Move) {
+func (game *Game) ChooseBestMove(gameState []float64, possibleMoves []Move) (bestMove Move) {
 
 	game.currentGameState = gameState
 	logg.LogTo("MAIN", "gameState: %v", gameState)
@@ -58,7 +58,7 @@ func (game *Game) GameLoop() {
 		// fetch game state and list of available moves from game server
 		gameState, possibleMoves := game.FetchNewGameDocument()
 
-		bestMove := game.ChooseBestMove(cortex, gameState, possibleMoves)
+		bestMove := game.ChooseBestMove(gameState, possibleMoves)
 
 		game.PostChosenMove(bestMove)
 
