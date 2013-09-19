@@ -8,7 +8,7 @@ import (
 type Game struct {
 	cortex               *ng.Cortex
 	currentGameState     []float64
-	currentPossibleMove  []float64
+	currentPossibleMove  Move
 	latestActuatorOutput []float64
 }
 
@@ -34,8 +34,7 @@ func (game *Game) GameLoop() {
 			logg.LogTo("MAIN", "possible move: %v", move)
 
 			// present it to the neural net
-			moveVector := move.VectorRepresentation()
-			game.currentPossibleMove = moveVector
+			game.currentPossibleMove = move
 			game.cortex.SyncSensors()
 			game.cortex.SyncActuators()
 
@@ -167,7 +166,7 @@ func (game *Game) CreateSensors() {
 
 	sensorFuncPossibleMove := func(syncCounter int) []float64 {
 		logg.LogTo("MAIN", "sensor func possible move called")
-		return game.currentPossibleMove
+		return game.currentPossibleMove.VectorRepresentation()
 	}
 	sensorPossibleMoveNodeId := ng.NewSensorId("SensorPossibleMove", sensorLayer)
 	sensorPossibleMove := &ng.Sensor{
