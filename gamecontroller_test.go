@@ -18,7 +18,32 @@ func TestCreateNeurgoCortex(t *testing.T) {
 
 }
 
-func TestGameLoop(t *testing.T) {
+func TestChooseBestMove(t *testing.T) {
+
+	ng.SeedRandom()
+	logg.LogKeys["MAIN"] = true
+
+	game := &Game{}
+	game.CreateNeurgoCortex()
+	cortex := game.cortex
+	cortex.Run()
+
+	gameState, possibleMoves := game.FetchNewGameDocument()
+	bestMove := game.ChooseBestMove(cortex, gameState, possibleMoves)
+
+	found := false
+	for _, possibleMove := range possibleMoves {
+		if possibleMove == bestMove {
+			found = true
+		}
+	}
+	assert.True(t, found)
+
+	cortex.Shutdown()
+
+}
+
+func DISTestGameLoop(t *testing.T) {
 	ng.SeedRandom()
 	logg.LogKeys["MAIN"] = true
 	game := &Game{}

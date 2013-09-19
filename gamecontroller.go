@@ -12,53 +12,70 @@ type Game struct {
 	latestActuatorOutput []float64
 }
 
+func (game *Game) ChooseBestMove(cortex *ng.Cortex, gameState []float64, possibleMoves []Move) (bestMove Move) {
+
+	game.currentGameState = gameState
+	logg.LogTo("MAIN", "gameState: %v", gameState)
+
+	var bestMoveRating []float64
+	bestMoveRating = []float64{-1000000000}
+
+	for _, move := range possibleMoves {
+
+		logg.LogTo("MAIN", "possible move: %v", move)
+
+		// present it to the neural net
+		game.currentPossibleMove = move
+		game.cortex.SyncSensors()
+		game.cortex.SyncActuators()
+
+		logg.LogTo("MAIN", "done sync'ing actuators")
+
+		logg.LogTo("MAIN", "actuator output %v bestMoveRating: %v", game.latestActuatorOutput[0], bestMoveRating[0])
+		if game.latestActuatorOutput[0] > bestMoveRating[0] {
+			logg.LogTo("MAIN", "actuator output > bestMoveRating")
+			bestMove = move
+			bestMoveRating[0] = game.latestActuatorOutput[0]
+		} else {
+			logg.LogTo("MAIN", "actuator output < bestMoveRating, ignoring")
+		}
+
+	}
+	return
+
+}
+
 func (game *Game) GameLoop() {
 
 	// get a neurgo network
 	game.CreateNeurgoCortex()
-	game.cortex.Run()
+	cortex := game.cortex
+
+	cortex.Run()
 
 	for {
 
 		// fetch game state and list of available moves from game server
 		gameState, possibleMoves := game.FetchNewGameDocument()
-		game.currentGameState = gameState
-		logg.LogTo("MAIN", "gameState: %v", gameState)
 
-		var bestMove Move
-		var bestMoveRating []float64
-		bestMoveRating = []float64{-1000000000}
+		bestMove := game.ChooseBestMove(cortex, gameState, possibleMoves)
 
-		for _, move := range possibleMoves {
-
-			logg.LogTo("MAIN", "possible move: %v", move)
-
-			// present it to the neural net
-			game.currentPossibleMove = move
-			game.cortex.SyncSensors()
-			game.cortex.SyncActuators()
-
-			logg.LogTo("MAIN", "done sync'ing actuators")
-
-			logg.LogTo("MAIN", "actuator output %v bestMoveRating: %v", game.latestActuatorOutput[0], bestMoveRating[0])
-			if game.latestActuatorOutput[0] > bestMoveRating[0] {
-				logg.LogTo("MAIN", "actuator output > bestMoveRating")
-				bestMove = move
-				bestMoveRating[0] = game.latestActuatorOutput[0]
-			} else {
-				logg.LogTo("MAIN", "actuator output < bestMoveRating, ignoring")
-			}
-
-		}
-
-		// post the chosen move to server
 		game.PostChosenMove(bestMove)
 
+		// when do we break out of the loop??
+
 	}
+
+	game.cortex.Shutdown()
 
 }
 
 func (game *Game) FetchNewGameDocument() (gameState []float64, possibleMoves []Move) {
+
+	// TODO: this should be
+	// - pulled from server
+	// - parsed into json
+	// - data structs should be extracted from json
 
 	gameState = make([]float64, 32)
 
