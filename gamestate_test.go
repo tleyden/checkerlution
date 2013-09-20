@@ -2,6 +2,7 @@ package checkerlution
 
 import (
 	"encoding/json"
+	"github.com/couchbaselabs/go.assert"
 	"github.com/couchbaselabs/logg"
 	"log"
 	"testing"
@@ -21,14 +22,11 @@ func TestParseGameState(t *testing.T) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	for _, team := range gameState.Teams {
-		logg.LogTo("TEST", "team: %v", team)
-		logg.LogTo("TEST", "team score: %v", team.Score)
-		for _, piece := range team.Pieces {
-			logg.LogTo("TEST", "piece: %v", piece)
-			logg.LogTo("TEST", "piece.location: %v", piece.Location)
-		}
 
+	assert.Equals(t, len(gameState.Teams), 2)
+
+	for _, team := range gameState.Teams {
+		assert.True(t, len(team.Pieces) > 0)
 	}
 
 }
