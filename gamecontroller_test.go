@@ -47,9 +47,7 @@ func TestChangesFeed(t *testing.T) {
 
 	options := make(map[string]interface{})
 	options["since"] = 0
-	logg.LogTo("TEST", "calling db.Changes with: %v", handleChange)
 	db.Changes(handleChangeLocal, options)
-	logg.LogTo("TEST", "done calling db.Changes")
 
 }
 
