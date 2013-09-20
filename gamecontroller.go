@@ -10,6 +10,7 @@ import (
 )
 
 const SERVER_URL = "http://localhost:4984/checkers"
+const GAME_DOC_ID = "game:checkers"
 
 type Game struct {
 	cortex               *ng.Cortex
@@ -20,25 +21,18 @@ type Game struct {
 	db                   couch.Database
 }
 
-// Game loop high-level logic:
-// Follow the changes feed
-// On each change callback:
-//   - make sure one of the changes is a game, if not, ignore it
-//   - get the latest game document
-//   - if it's not our turn, do nothing
-//   - if it is our turn, make sure we haven't already made a move
-//     - if it's really our turn, call cortex to calculate next move
-//     - make next move by inserting a new revision of votes doc
+type Document map[string]interface{}
 
 type Changes map[string]interface{}
 
+// Follow the changes feed and on each change callback
+// call game.handleChanges() which will drive the game
 func (game *Game) GameLoop() {
 
 	game.InitGame()
 
 	curSinceValue := "0"
 
-	// TODO: is it possible to make this a top level func or method?
 	handleChange := func(reader io.Reader) string {
 		changes := decodeChanges(reader)
 		game.handleChanges(changes)
@@ -52,8 +46,37 @@ func (game *Game) GameLoop() {
 
 }
 
+// - (optional) make sure one of the changes is a game, if not, ignore it
+// - get the latest game document
+// - if it's not our turn, do nothing
+// - if it is our turn, make sure we haven't already made a move
+//   - if it's really our turn, call cortex to calculate next move
+//   - make next move by inserting a new revision of votes doc
 func (game Game) handleChanges(changes Changes) {
 	logg.LogTo("DEBUG", "handleChanges called with %v", changes)
+	gameDocChanged := game.checkGameDocInChanges(changes)
+	if gameDocChanged {
+		gameDoc, err := game.fetchLatestGameDoc()
+		if err != nil {
+			logg.LogError(err)
+			return
+		}
+		logg.LogTo("DEBUG", "gameDoc: %v", gameDoc)
+	}
+
+}
+
+func (game Game) checkGameDocInChanges(changes Changes) bool {
+	return true
+}
+
+func (game Game) fetchLatestGameDoc() (doc Document, err error) {
+	fetchedDoc := new(Document)
+	err = game.db.Retrieve(GAME_DOC_ID, fetchedDoc)
+	if err == nil {
+		doc = *fetchedDoc
+	}
+	return
 }
 
 func (game *Game) InitGame() {

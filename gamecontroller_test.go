@@ -18,6 +18,17 @@ func TestCreateNeurgoCortex(t *testing.T) {
 
 }
 
+func TestFetchLatestGameDocument(t *testing.T) {
+	game := &Game{}
+	game.InitGame()
+	gameDoc, err := game.fetchLatestGameDoc()
+	if err != nil {
+		logg.Log("gameDoc: %v.  err: %v", gameDoc, err)
+		panic("err")
+	}
+	logg.Log("gameDoc: %v.  err: %v", gameDoc, err)
+}
+
 func FakeGameDocument() (gameState []float64, possibleMoves []Move) {
 
 	gameState = make([]float64, 32)
