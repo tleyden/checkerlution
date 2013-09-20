@@ -6,6 +6,7 @@ import (
 	"github.com/couchbaselabs/logg"
 	ng "github.com/tleyden/neurgo"
 	"io"
+	"strings"
 	"time"
 )
 
@@ -67,7 +68,18 @@ func (game Game) handleChanges(changes Changes) {
 }
 
 func (game Game) checkGameDocInChanges(changes Changes) bool {
-	return true
+	foundGameDoc := false
+	changeResultsRaw := changes["results"]
+	changeResults := changeResultsRaw.([]interface{})
+	for _, changeResultRaw := range changeResults {
+		changeResult := changeResultRaw.(map[string]interface{})
+		docIdRaw := changeResult["id"]
+		docId := docIdRaw.(string)
+		if strings.Contains(docId, GAME_DOC_ID) {
+			foundGameDoc = true
+		}
+	}
+	return foundGameDoc
 }
 
 func (game Game) fetchLatestGameDoc() (doc Document, err error) {
