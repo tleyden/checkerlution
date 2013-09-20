@@ -41,6 +41,39 @@ func TestIsOurTurn(t *testing.T) {
 
 }
 
+func TestExtractGameStateVector(t *testing.T) {
+	jsonString := `{"applicationUrl":"http://www.couchbase.com/checkers","applicationName":"Couchbase Checkers","revotingAllowed":false,"highlightPiecesWithMoves":true,"number":1,"startTime":"2013-08-26T16:05:30Z","moveDeadline":"2013-08-26T16:05:45Z","turn":1,"activeTeam":0,"winningTeam":0,"moves":[],"teams":[{"participantCount":117983,"score":11,"pieces":[{"location":1,"king":true},{"location":2},{"location":3},{"location":4},{"location":5},{"location":6},{"location":7,"validMoves":[{"locations":[11],"captures":[{"team":1,"piece":11}],"king":true}]},{"location":8,"validMoves":[{"locations":[11],"captures":[{"team":1,"piece":8},{"team":1,"piece":9},{"team":1,"piece":10}]},{"locations":[11,15]}]},{"location":9,"validMoves":[{"locations":[13]},{"locations":[14]}]},{"location":10,"validMoves":[{"locations":[14]},{"locations":[15]}]},{"location":11,"captured":true},{"location":12,"king":true,"validMoves":[{"locations":[16]}]}]},{"participantCount":109217,"score":12,"pieces":[{"location":21},{"location":22},{"location":23},{"location":24},{"location":25},{"location":26},{"location":27},{"location":28},{"location":29},{"location":30},{"location":31},{"location":32}]}]}`
+
+	jsonBytes := []byte(jsonString)
+
+	gameState := &GameState{}
+	err := json.Unmarshal(jsonBytes, gameState)
+	if err != nil {
+		log.Fatal(err)
+	}
+	for _, team := range gameState.Teams {
+		logg.LogTo("TEST", "team: %v", team)
+
+	}
+
+	/*
+
+		jsonBytes := []byte(jsonString)
+		gameDoc := new(Document)
+		err := json.Unmarshal(jsonBytes, gameDoc)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		game := &Game{}
+		game.InitGame()
+		gameStateVector := game.extractGameStateVector(gameDoc)
+
+		logg.LogTo("TESTING", "gameStateVector: %v", gameStateVector)
+	*/
+
+}
+
 func TestCheckGameDocInChanges(t *testing.T) {
 
 	jsonString := `{"results":[{"seq":"*:3408","id":"user:6213C1A1-4E5F-429E-91C9-CDC2BF1537C3","changes":[{"rev":"3-783b9cda9b7b9e6faac2d8bda9e16535"}]},{"seq":"*:3409","id":"vote:6213C1A1-4E5F-429E-91C9-CDC2BF1537C3","changes":[{"rev":"1-393aaf8f37404c4a0159d9ec8dc1e0ee"}]},{"seq":"*:3440","id":"votes:checkers","changes":[{"rev":"16-ebaa86d97e63940fddfdbd11a219e9e6"}]},{"seq":"*:3641","id":"game:checkers","changes":[{"rev":"3586-09a232e6b524940185b0b268483981ea"}]}],"last_seq":"*:3641"}`
