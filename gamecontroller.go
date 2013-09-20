@@ -9,6 +9,8 @@ import (
 	"time"
 )
 
+const SERVER_URL = "http://localhost:4984/checkers"
+
 type Game struct {
 	cortex               *ng.Cortex
 	currentGameState     []float64
@@ -68,36 +70,6 @@ func (game *Game) InitDbConnection() {
 	}
 	game.db = db
 }
-
-/*
-// Get rid of this..
-func (game *Game) GameLoopOld() {
-
-	client := Client{}
-
-	// get a neurgo network
-	game.CreateNeurgoCortex()
-	cortex := game.cortex
-
-	cortex.Run()
-
-	for {
-
-		// fetch game state and list of available moves from game server
-		gameState, possibleMoves := client.FetchNewGameDocument()
-
-		bestMove := game.ChooseBestMove(gameState, possibleMoves)
-
-		game.PostChosenMove(bestMove)
-
-		// when do we break out of the loop??
-
-	}
-
-	game.cortex.Shutdown()
-
-}
-*/
 
 func (game *Game) ChooseBestMove(gameState []float64, possibleMoves []Move) (bestMove Move) {
 
