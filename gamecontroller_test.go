@@ -2,10 +2,13 @@ package checkerlution
 
 import (
 	"code.google.com/p/dsallings-couch-go"
+	"encoding/json"
 	"github.com/couchbaselabs/go.assert"
 	"github.com/couchbaselabs/logg"
 	ng "github.com/tleyden/neurgo"
+	"io"
 	"testing"
+	"time"
 )
 
 func TestChangesFeed(t *testing.T) {
@@ -13,16 +16,39 @@ func TestChangesFeed(t *testing.T) {
 	logg.LogNoColor()
 	logg.LogKeys["TEST"] = true
 	logg.LogKeys["DEBUG"] = true
+
+	game := &Game{}
+
 	db, error := couch.Connect(SERVER_URL)
 	if error != nil {
 		logg.LogPanic("Error connecting to %v: %v", SERVER_URL, error)
 	}
 	logg.LogTo("TEST", "db: %v", db)
 
+	lastSeqSoFar := "0"
+
+	handleChangeLocal := func(reader io.Reader) string {
+		logg.LogTo("DEBUG", "handleChangeLocal")
+		logg.LogTo("DEBUG", "inside func game: %v", &game)
+		changes := make(map[string]interface{})
+		decoder := json.NewDecoder(reader)
+		decoder.Decode(&changes)
+		logg.LogTo("DEBUG", "changes: %v", changes)
+		lastSeq := changes["last_seq"]
+		lastSeqAsString := lastSeq.(string)
+		if lastSeq != nil && len(lastSeqAsString) > 0 {
+			lastSeqSoFar = lastSeqAsString
+			logg.LogTo("DEBUG", "set lastSeq to: %v", lastSeqSoFar)
+		}
+		time.Sleep(time.Second * 5)
+		return lastSeqSoFar
+	}
+	logg.LogTo("DEBUG", "game: %v", &game)
+
 	options := make(map[string]interface{})
 	options["since"] = 0
 	logg.LogTo("TEST", "calling db.Changes with: %v", handleChange)
-	db.Changes(handleChange, options)
+	db.Changes(handleChangeLocal, options)
 	logg.LogTo("TEST", "done calling db.Changes")
 
 }

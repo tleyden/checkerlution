@@ -16,6 +16,6 @@ func handleChange(reader io.Reader) string {
 	// logg.LogTo("DEBUG", "lastSeq: %v", lastSeq)
 	lastSeqAsString := lastSeq.(string)
 	logg.LogTo("DEBUG", "return lastSeq: %v", lastSeq)
-	time.Sleep(time.Second * 30)
+	time.Sleep(time.Second * 5)
 	return lastSeqAsString
 }
