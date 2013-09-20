@@ -1,8 +1,12 @@
 package checkerlution
 
 import (
+	"code.google.com/p/dsallings-couch-go"
+	"encoding/json"
 	"github.com/couchbaselabs/logg"
 	ng "github.com/tleyden/neurgo"
+	"io"
+	"time"
 )
 
 type Game struct {
@@ -10,17 +14,64 @@ type Game struct {
 	currentGameState     []float64
 	currentPossibleMove  Move
 	latestActuatorOutput []float64
+	ourTeamId            int
+	db                   couch.Database
 }
 
 // Game loop high-level logic:
 // Follow the changes feed
 // On each change callback:
+//   - make sure one of the changes is a game, if not, ignore it
+//   - get the latest game document
 //   - if it's not our turn, do nothing
 //   - if it is our turn, make sure we haven't already made a move
 //     - if it's really our turn, call cortex to calculate next move
 //     - make next move by inserting a new revision of votes doc
 
+type Changes map[string]interface{}
+
 func (game *Game) GameLoop() {
+
+	game.InitGame()
+
+	curSinceValue := "0"
+
+	// TODO: is it possible to make this a top level func or method?
+	handleChange := func(reader io.Reader) string {
+		changes := decodeChanges(reader)
+		game.handleChanges(changes)
+		curSinceValue = calculateNextSinceValue(curSinceValue, changes)
+		time.Sleep(time.Second * 5)
+		return curSinceValue
+	}
+
+	options := Changes{"since": "0"}
+	game.db.Changes(handleChange, options)
+
+}
+
+func (game Game) handleChanges(changes Changes) {
+	logg.LogTo("DEBUG", "handleChanges called with %v", changes)
+}
+
+func (game *Game) InitGame() {
+	game.CreateNeurgoCortex()
+	cortex := game.cortex
+	cortex.Run()
+	game.InitDbConnection()
+}
+
+func (game *Game) InitDbConnection() {
+	db, error := couch.Connect(SERVER_URL)
+	if error != nil {
+		logg.LogPanic("Error connecting to %v: %v", SERVER_URL, error)
+	}
+	game.db = db
+}
+
+/*
+// Get rid of this..
+func (game *Game) GameLoopOld() {
 
 	client := Client{}
 
@@ -46,6 +97,7 @@ func (game *Game) GameLoop() {
 	game.cortex.Shutdown()
 
 }
+*/
 
 func (game *Game) ChooseBestMove(gameState []float64, possibleMoves []Move) (bestMove Move) {
 
@@ -174,4 +226,20 @@ func (game *Game) CreateSensors() {
 	}
 	game.cortex.SetSensors([]*ng.Sensor{sensorGameState, sensorPossibleMove})
 
+}
+
+func decodeChanges(reader io.Reader) Changes {
+	changes := make(Changes)
+	decoder := json.NewDecoder(reader)
+	decoder.Decode(&changes)
+	return changes
+}
+
+func calculateNextSinceValue(curSinceValue string, changes Changes) string {
+	lastSeq := changes["last_seq"]
+	lastSeqAsString := lastSeq.(string)
+	if lastSeq != nil && len(lastSeqAsString) > 0 {
+		return lastSeqAsString
+	}
+	return curSinceValue
 }

@@ -1,16 +1,13 @@
 package checkerlution
 
 import (
-	"code.google.com/p/dsallings-couch-go"
-	"encoding/json"
 	"github.com/couchbaselabs/go.assert"
 	"github.com/couchbaselabs/logg"
 	ng "github.com/tleyden/neurgo"
-	"io"
 	"testing"
-	"time"
 )
 
+/*
 func TestChangesFeed(t *testing.T) {
 
 	logg.LogNoColor()
@@ -50,6 +47,7 @@ func TestChangesFeed(t *testing.T) {
 	db.Changes(handleChangeLocal, options)
 
 }
+*/
 
 func TestCreateNeurgoCortex(t *testing.T) {
 	game := &Game{}
@@ -112,9 +110,10 @@ func TestChooseBestMove(t *testing.T) {
 
 }
 
-func DISTestGameLoop(t *testing.T) {
+func TestGameLoop(t *testing.T) {
 	ng.SeedRandom()
 	logg.LogKeys["MAIN"] = true
+	logg.LogKeys["DEBUG"] = true
 	game := &Game{}
 	game.GameLoop()
 

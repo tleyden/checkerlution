@@ -18,6 +18,7 @@ type GenericMap map[string]interface{}
 type Client struct {
 }
 
+// TODO: remove this dead code
 func (client Client) fetchChangesFeed() (data GenericMap) {
 
 	url := CHANGES_FEED_URL
@@ -41,6 +42,7 @@ func (client Client) fetchChangesFeed() (data GenericMap) {
 	return
 }
 
+// TODO: remove this dead code
 func (client Client) extractGameRevision(changesFeedMap GenericMap) (gameRev string) {
 
 	results := changesFeedMap["results"]
@@ -49,6 +51,7 @@ func (client Client) extractGameRevision(changesFeedMap GenericMap) (gameRev str
 
 }
 
+// TODO: remove this dead code
 func (client Client) FetchNewGameDocument() (gameState []float64, possibleMoves []Move) {
 
 	changesFeedMap := client.fetchChangesFeed()
