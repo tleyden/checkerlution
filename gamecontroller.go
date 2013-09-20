@@ -50,8 +50,9 @@ func (game *Game) GameLoop() {
 // - (optional) make sure one of the changes is a game, if not, ignore it
 // - get the latest game document
 // - if it's not our turn, do nothing
-// - if it is our turn, make sure we haven't already made a move
-//   - if it's really our turn, call cortex to calculate next move
+// - if it is our turn
+//   - parse out the required data structures needed to pass to cortex
+//   - call cortex to calculate next move
 //   - make next move by inserting a new revision of votes doc
 func (game Game) handleChanges(changes Changes) {
 	logg.LogTo("DEBUG", "handleChanges called with %v", changes)
@@ -63,8 +64,19 @@ func (game Game) handleChanges(changes Changes) {
 			return
 		}
 		logg.LogTo("DEBUG", "gameDoc: %v", gameDoc)
+		if isOurTurn := game.isOurTurn(gameDoc); !isOurTurn {
+			logg.LogTo("DEBUG", "It's not our turn, ignoring changes")
+			return
+		}
+
 	}
 
+}
+
+func (game Game) isOurTurn(gameDoc Document) bool {
+	activeTeamRaw := gameDoc["activeTeam"]
+	activeTeam := int(activeTeamRaw.(float64))
+	return activeTeam == game.ourTeamId
 }
 
 func (game Game) checkGameDocInChanges(changes Changes) bool {
