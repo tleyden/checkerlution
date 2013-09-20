@@ -12,6 +12,14 @@ type Game struct {
 	latestActuatorOutput []float64
 }
 
+// Game loop high-level logic:
+// Follow the changes feed
+// On each change callback:
+//   - if it's not our turn, do nothing
+//   - if it is our turn, make sure we haven't already made a move
+//     - if it's really our turn, call cortex to calculate next move
+//     - make next move by inserting a new revision of votes doc
+
 func (game *Game) GameLoop() {
 
 	client := Client{}

@@ -7,6 +7,10 @@ import (
 	"net/http"
 )
 
+const SERVER_URL = "http://localhost:4984/checkers"
+
+// const SERVER_URL = "http://localhost:5984/couchchat"
+
 const CHANGES_FEED_URL = "http://localhost:4984/checkers/_changes?feed=longpoll&timeout=20000"
 
 type GenericMap map[string]interface{}
@@ -48,8 +52,11 @@ func (client Client) extractGameRevision(changesFeedMap GenericMap) (gameRev str
 func (client Client) FetchNewGameDocument() (gameState []float64, possibleMoves []Move) {
 
 	changesFeedMap := client.fetchChangesFeed()
-	gameRev := client.extractGameRevision(changesFeedMap)
+
+	gameRev := client.extractGameRevision(changesFeedMap) // maybe unnecessary
 	logg.LogTo("MAIN", "gameRev: %v", gameRev)
+
+	// get the game doc corresponding to this revision
 
 	// TODO: this should be
 	// - pulled from server

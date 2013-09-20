@@ -1,11 +1,31 @@
 package checkerlution
 
 import (
+	"code.google.com/p/dsallings-couch-go"
 	"github.com/couchbaselabs/go.assert"
 	"github.com/couchbaselabs/logg"
 	ng "github.com/tleyden/neurgo"
 	"testing"
 )
+
+func TestChangesFeed(t *testing.T) {
+
+	logg.LogNoColor()
+	logg.LogKeys["TEST"] = true
+	logg.LogKeys["DEBUG"] = true
+	db, error := couch.Connect(SERVER_URL)
+	if error != nil {
+		logg.LogPanic("Error connecting to %v: %v", SERVER_URL, error)
+	}
+	logg.LogTo("TEST", "db: %v", db)
+
+	options := make(map[string]interface{})
+	options["since"] = 0
+	logg.LogTo("TEST", "calling db.Changes with: %v", handleChange)
+	db.Changes(handleChange, options)
+	logg.LogTo("TEST", "done calling db.Changes")
+
+}
 
 func TestCreateNeurgoCortex(t *testing.T) {
 	game := &Game{}
