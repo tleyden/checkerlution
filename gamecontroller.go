@@ -3,7 +3,9 @@ package checkerlution
 import (
 	"code.google.com/p/dsallings-couch-go"
 	"encoding/json"
+	"fmt"
 	"github.com/couchbaselabs/logg"
+	"github.com/nu7hatch/gouuid"
 	ng "github.com/tleyden/neurgo"
 	"io"
 	"strings"
@@ -17,6 +19,7 @@ const VOTES_DOC_ID = "votes:checkers"
 type Game struct {
 	cortex               *ng.Cortex
 	currentGameState     GameStateVector
+	gameState            GameState
 	currentPossibleMove  ValidMoveCortexInput
 	latestActuatorOutput []float64
 	ourTeamId            int
@@ -58,6 +61,7 @@ func (game *Game) handleChanges(changes Changes) {
 	gameDocChanged := game.checkGameDocInChanges(changes)
 	if gameDocChanged {
 		gameState, err := game.fetchLatestGameState()
+		game.gameState = gameState
 		if err != nil {
 			logg.LogError(err)
 			return
@@ -214,22 +218,68 @@ func dumpVotes(votes *Votes) {
 
 func (game *Game) PostChosenMove(move ValidMoveCortexInput) {
 	logg.LogTo("MAIN", "post chosen move: %v", move.validMove)
-	votes, err := game.fetchLatestVotes()
-	dumpVotes(votes)
+	latestVotes, err := game.fetchLatestVotes()
+	dumpVotes(latestVotes)
 	if err != nil {
 		panic(err)
 	}
-	logg.LogTo("MAIN", "votes.moves: %v", votes.Moves)
-	votes.SetMove(move)
-	dumpVotes(votes)
-	logg.LogTo("MAIN", "after setMove, votes: %v", votes)
-	logg.LogTo("MAIN", "after setMove, votes.moves: %v", votes.Moves)
+	logg.LogTo("MAIN", "votes.moves: %v", latestVotes.Moves)
+	latestVotes.SetMove(move)
+	dumpVotes(latestVotes)
+	logg.LogTo("MAIN", "after setMove, votes: %v", latestVotes)
+	logg.LogTo("MAIN", "after setMove, votes.moves: %v", latestVotes.Moves)
 
-	newRevision, err := game.db.Edit(votes)
-	logg.LogTo("MAIN", "newRevision: %v err: %v", newRevision, err)
+	/**
+
+	{
+	        "turn": 1,
+	        "piece": 11,
+	        "team": 0,
+	        "_id": "vote:FF7D0564-C8B8-4EFA-9E7F-EE95C22A0444",
+	        "_rev": "1-bccce355a34b387394d2f25d2f03bc94",
+	        "game": 157863,
+	        "_revisions": {
+	            "ids": ["bccce355a34b387394d2f25d2f03bc94"],
+	            "start": 1
+	        },
+	        "locations": [12, 16]
+	    }
+	*/
+
+	u4, err := uuid.NewV4()
 	if err != nil {
 		logg.LogError(err)
+		return
 	}
+
+	votes := &OutgoingVotes{}
+	votes.Id = fmt.Sprintf("vote:%s", u4)
+	// votes.Rev = "1-bccce355a34b387394d2f25d2f03bc94"
+	revisions := make(map[string]interface{})
+	revisionIds := []string{"bccce355a34b387394d2f25d2f03bc94"}
+	revisions["ids"] = revisionIds
+	revisions["start"] = 1.0
+	// votes.Revisions = revisions
+	votes.Turn = latestVotes.Turn + 1
+	votes.PieceId = move.validMove.PieceId
+	votes.TeamId = game.ourTeamId
+	votes.GameId = game.gameState.Number
+	// TODO: locations!
+
+	// TODO: this is actually a bug, because if there is a
+	// double jump it will only send the first jump move
+	endLocation := move.validMove.Locations[0]
+	locations := []int{move.validMove.StartLocation, endLocation}
+	votes.Locations = locations
+
+	newId, newRevision, err := game.db.Insert(votes)
+
+	logg.LogTo("MAIN", "newId: %v, newRevision: %v err: %v", newId, newRevision, err)
+	if err != nil {
+		logg.LogError(err)
+		return
+	}
+
 }
 
 func (game *Game) CreateNeurgoCortex() {
