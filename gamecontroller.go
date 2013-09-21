@@ -80,7 +80,7 @@ func (game *Game) handleChanges(changes Changes) {
 
 		logg.LogTo("DEBUG", "bestMove: %v", bestMove)
 
-		// game.PostChosenMove(bestMove)
+		game.PostChosenMove(bestMove)
 
 	}
 
@@ -203,14 +203,33 @@ func (game Game) fetchLatestVotes() (votes *Votes, err error) {
 	return
 }
 
-func (game *Game) PostChosenMove(move ValidMoveCortexInput) {
-	logg.LogTo("MAIN", "post chosen move: %v", move)
-	votes, err := game.fetchLatestVotes()
+func dumpVotes(votes *Votes) {
+	json_buf, err := json.Marshal(votes)
 	if err != nil {
 		panic(err)
 	}
+	jsonString := string(json_buf)
+	logg.LogTo("MAIN", "votes json: %v", jsonString)
+}
+
+func (game *Game) PostChosenMove(move ValidMoveCortexInput) {
+	logg.LogTo("MAIN", "post chosen move: %v", move.validMove)
+	votes, err := game.fetchLatestVotes()
+	dumpVotes(votes)
+	if err != nil {
+		panic(err)
+	}
+	logg.LogTo("MAIN", "votes.moves: %v", votes.Moves)
 	votes.SetMove(move)
-	logg.LogTo("MAIN", "votes: %v", votes)
+	dumpVotes(votes)
+	logg.LogTo("MAIN", "after setMove, votes: %v", votes)
+	logg.LogTo("MAIN", "after setMove, votes.moves: %v", votes.Moves)
+
+	newRevision, err := game.db.Edit(votes)
+	logg.LogTo("MAIN", "newRevision: %v err: %v", newRevision, err)
+	if err != nil {
+		logg.LogError(err)
+	}
 }
 
 func (game *Game) CreateNeurgoCortex() {

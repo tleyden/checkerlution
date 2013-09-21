@@ -1,11 +1,15 @@
 package checkerlution
 
 type Votes struct {
-	Moves  []VoteMove `json:"moves"`
-	TeamId int        `json:"team"`
-	GameId int        `json:"game"`
-	Count  int        `json:"count"`
-	Turn   int        `json:"turn"`
+	Id        string        `json:"_id"`
+	Rev       string        `json:"_rev"`
+	Revisions []interface{} `json:"_revisions"`
+	Channels  []interface{} `json:"cahnnels"`
+	Moves     []VoteMove    `json:"moves"`
+	TeamId    int           `json:"team"`
+	GameId    int           `json:"game"`
+	Count     int           `json:"count"`
+	Turn      int           `json:"turn"`
 }
 
 type VoteMove struct {
@@ -18,16 +22,21 @@ type VoteMove struct {
 }
 
 func (votes *Votes) SetMove(move ValidMoveCortexInput) {
-	/*
-		// TODO locations := []int{ move.validMove.}
-		voteMove := VoteMove{
-			GameId: votes.GameId,
-			Count:  votes.Count,
-			// TODO!! PieceId: move.PieceId,
-			TeamId: votes.TeamId,
-			Turn:   votes.Turn,
-			// TODO: Locations:
-		}
-	*/
+
+	// TODO: this is actually a bug, because if there is a
+	// double jump it will only send the first jump move
+	endLocation := move.validMove.Locations[0]
+
+	locations := []int{move.validMove.StartLocation, endLocation}
+	voteMove := VoteMove{
+		GameId:    votes.GameId,
+		Count:     votes.Count,
+		PieceId:   move.validMove.PieceId,
+		TeamId:    votes.TeamId,
+		Turn:      votes.Turn,
+		Locations: locations,
+	}
+	moves := []VoteMove{voteMove}
+	votes.Moves = moves
 
 }
