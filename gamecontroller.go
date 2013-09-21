@@ -52,7 +52,7 @@ func (game *Game) GameLoop() {
 //   - parse out the required data structures needed to pass to cortex
 //   - call cortex to calculate next move
 //   - make next move by inserting a new revision of votes doc
-func (game Game) handleChanges(changes Changes) {
+func (game *Game) handleChanges(changes Changes) {
 	logg.LogTo("DEBUG", "handleChanges called with %v", changes)
 	gameDocChanged := game.checkGameDocInChanges(changes)
 	if gameDocChanged {
@@ -172,7 +172,7 @@ func (game *Game) ChooseBestMove(gameStateVector GameStateVector, possibleMoves 
 
 	for _, move := range possibleMoves {
 
-		logg.LogTo("MAIN", "possible move: %v", move)
+		logg.LogTo("MAIN", "feed possible move to cortex: %v", move)
 
 		// present it to the neural net
 		game.currentPossibleMove = move

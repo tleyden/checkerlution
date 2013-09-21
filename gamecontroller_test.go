@@ -10,6 +10,9 @@ import (
 )
 
 func init() {
+
+	logg.LogKeys["NODE_SEND"] = true
+	logg.LogKeys["NODE_RECV"] = true
 	logg.LogKeys["TEST"] = true
 	logg.LogKeys["DEBUG"] = true
 
@@ -126,8 +129,6 @@ func TestChooseBestMove(t *testing.T) {
 
 func TestGameLoop(t *testing.T) {
 	ng.SeedRandom()
-	logg.LogKeys["MAIN"] = true
-	logg.LogKeys["DEBUG"] = true
 	game := &Game{ourTeamId: 0}
 	game.GameLoop()
 
