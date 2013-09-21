@@ -89,10 +89,9 @@ func (game Game) extractPossibleMoves(gameState GameState) []ValidMoveCortexInpu
 
 	moves := make([]ValidMoveCortexInput, 0)
 
-	opponentTeamId := game.opponentTeamId()
-	opponentTeam := gameState.Teams[opponentTeamId]
+	ourTeam := gameState.Teams[game.ourTeamId]
 
-	for _, piece := range opponentTeam.Pieces {
+	for _, piece := range ourTeam.Pieces {
 		for _, validMove := range piece.ValidMoves {
 			moveInput := NewValidMoveCortexInput(validMove, piece)
 			moves = append(moves, moveInput)

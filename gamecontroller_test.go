@@ -47,7 +47,7 @@ func TestExtractPossibleMoves(t *testing.T) {
 
 	gameState := NewGameStateFromString(jsonString)
 
-	game := &Game{ourTeamId: 1}
+	game := &Game{ourTeamId: 0}
 	game.InitGame()
 
 	possibleMoves := game.extractPossibleMoves(gameState)
