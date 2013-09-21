@@ -13,14 +13,6 @@ import (
 const SERVER_URL = "http://localhost:4984/checkers"
 const GAME_DOC_ID = "game:checkers"
 
-// game state array with 32 elements, possible values:
-// -1.0: opponent king
-// -0.5: opponent piece
-// 0: empty
-// 0.5 our piece
-// 1.0: our king
-type GameStateVector []float64
-
 type Game struct {
 	cortex               *ng.Cortex
 	currentGameState     GameStateVector
@@ -75,7 +67,7 @@ func (game Game) handleChanges(changes Changes) {
 			return
 		}
 
-		// gameState := game.extractGameStateVector(gameState)
+		// gameStateVector := game.extractGameStateVector(gameState)
 		// possibleMoves := game.extractPossibleMoves(gameState)
 
 		// bestMove := game.ChooseBestMove(gameState, possibleMoves)
@@ -84,6 +76,12 @@ func (game Game) handleChanges(changes Changes) {
 
 	}
 
+}
+
+func (game Game) extractGameStateVector(gameState GameState) GameStateVector {
+	gameStateVector := NewGameStateVector()
+	gameStateVector.loadFromGameState(gameState, game.ourTeamId)
+	return gameStateVector
 }
 
 func (game Game) isOurTurn(gameState GameState) bool {
