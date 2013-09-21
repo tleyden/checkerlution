@@ -93,7 +93,7 @@ func TestChooseBestMove(t *testing.T) {
 
 	found := false
 	for _, possibleMove := range possibleMoves {
-		if possibleMove == bestMove {
+		if &possibleMove == &bestMove {
 			found = true
 		}
 	}
@@ -112,11 +112,11 @@ func TestGameLoop(t *testing.T) {
 
 }
 
-func FakeGameDocument() (gameState []float64, possibleMoves []Move) {
+func FakeGameDocument() (gameState []float64, possibleMoves []ValidMoveCortexInput) {
 
 	gameState = make([]float64, 32)
 
-	possibleMove1 := Move{
+	possibleMove1 := ValidMoveCortexInput{
 		startLocation:   0,
 		isCurrentlyKing: -1,
 		endLocation:     1.0,
@@ -124,7 +124,7 @@ func FakeGameDocument() (gameState []float64, possibleMoves []Move) {
 		captureValue:    1,
 	}
 
-	possibleMove2 := Move{
+	possibleMove2 := ValidMoveCortexInput{
 		startLocation:   1,
 		isCurrentlyKing: -0.5,
 		endLocation:     0.0,
@@ -132,7 +132,7 @@ func FakeGameDocument() (gameState []float64, possibleMoves []Move) {
 		captureValue:    0,
 	}
 
-	possibleMoves = []Move{possibleMove1, possibleMove2}
+	possibleMoves = []ValidMoveCortexInput{possibleMove1, possibleMove2}
 	return
 
 }

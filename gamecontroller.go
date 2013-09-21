@@ -16,7 +16,7 @@ const GAME_DOC_ID = "game:checkers"
 type Game struct {
 	cortex               *ng.Cortex
 	currentGameState     GameStateVector
-	currentPossibleMove  Move
+	currentPossibleMove  ValidMoveCortexInput
 	latestActuatorOutput []float64
 	ourTeamId            int
 	db                   couch.Database
@@ -67,7 +67,10 @@ func (game Game) handleChanges(changes Changes) {
 			return
 		}
 
-		// gameStateVector := game.extractGameStateVector(gameState)
+		gameStateVector := game.extractGameStateVector(gameState)
+
+		logg.LogTo("DEBUG", "gameStateVector: %v", gameStateVector)
+
 		// possibleMoves := game.extractPossibleMoves(gameState)
 
 		// bestMove := game.ChooseBestMove(gameState, possibleMoves)
@@ -127,7 +130,7 @@ func (game *Game) InitDbConnection() {
 	game.db = db
 }
 
-func (game *Game) ChooseBestMove(gameState []float64, possibleMoves []Move) (bestMove Move) {
+func (game *Game) ChooseBestMove(gameState []float64, possibleMoves []ValidMoveCortexInput) (bestMove ValidMoveCortexInput) {
 
 	// Todo: the code below is an implementation of a single MoveChooser
 	// but an interface should be designed so this is pluggable
@@ -163,7 +166,7 @@ func (game *Game) ChooseBestMove(gameState []float64, possibleMoves []Move) (bes
 
 }
 
-func (game *Game) PostChosenMove(move Move) {
+func (game *Game) PostChosenMove(move ValidMoveCortexInput) {
 	logg.LogTo("MAIN", "chosen move: %v", move)
 }
 
