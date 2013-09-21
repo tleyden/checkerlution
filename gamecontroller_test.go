@@ -109,10 +109,12 @@ func TestChooseBestMove(t *testing.T) {
 
 	gameState, possibleMoves := FakeGameDocument()
 	bestMove := game.ChooseBestMove(gameState, possibleMoves)
+	logg.LogTo("TEST", "bestMove: %v", &bestMove)
 
 	found := false
 	for _, possibleMove := range possibleMoves {
-		if &possibleMove == &bestMove {
+		logg.LogTo("TEST", "possibleMove: %v", &possibleMove)
+		if possibleMove.Equals(bestMove) {
 			found = true
 		}
 	}

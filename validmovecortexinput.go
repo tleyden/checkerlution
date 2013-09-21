@@ -64,6 +64,16 @@ func NewValidMoveCortexInput(validMove ValidMove, piece Piece) ValidMoveCortexIn
 	return moveInput
 }
 
+func (move ValidMoveCortexInput) Equals(other ValidMoveCortexInput) bool {
+
+	return move.startLocation == other.startLocation &&
+		move.endLocation == other.endLocation &&
+		move.captureValue == other.captureValue &&
+		move.isCurrentlyKing == other.isCurrentlyKing &&
+		move.willBecomeKing == other.willBecomeKing
+
+}
+
 func (move ValidMoveCortexInput) VectorRepresentation() []float64 {
 	vector := make([]float64, 5)
 	vector[0] = move.startLocation
