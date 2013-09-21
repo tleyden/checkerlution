@@ -1,10 +1,25 @@
 package checkerlution
 
+import (
+	"encoding/json"
+	"github.com/couchbaselabs/logg"
+)
+
 // data structure that corresponds to the checkers:game json doc
 type GameState struct {
 	Teams      []Team `json:"teams"`
 	ActiveTeam int    `json:"activeTeam"`
 	Number     int    `json:"number"`
+}
+
+func NewGameStateFromString(jsonString string) GameState {
+	gameState := &GameState{}
+	jsonBytes := []byte(jsonString)
+	err := json.Unmarshal(jsonBytes, gameState)
+	if err != nil {
+		logg.LogError(err)
+	}
+	return *gameState
 }
 
 type Piece struct {

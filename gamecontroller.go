@@ -30,8 +30,6 @@ type Game struct {
 	db                   couch.Database
 }
 
-type Document map[string]interface{}
-
 type Changes map[string]interface{}
 
 // Follow the changes feed and on each change callback
@@ -66,19 +64,19 @@ func (game Game) handleChanges(changes Changes) {
 	logg.LogTo("DEBUG", "handleChanges called with %v", changes)
 	gameDocChanged := game.checkGameDocInChanges(changes)
 	if gameDocChanged {
-		gameDoc, err := game.fetchLatestGameDoc()
+		gameState, err := game.fetchLatestGameState()
 		if err != nil {
 			logg.LogError(err)
 			return
 		}
-		logg.LogTo("DEBUG", "gameDoc: %v", gameDoc)
-		if isOurTurn := game.isOurTurn(gameDoc); !isOurTurn {
+		logg.LogTo("DEBUG", "gameState: %v", gameState)
+		if isOurTurn := game.isOurTurn(gameState); !isOurTurn {
 			logg.LogTo("DEBUG", "It's not our turn, ignoring changes")
 			return
 		}
 
-		// gameState := game.extractGameStateVector(gameDoc)
-		// possibleMoves := game.extractPossibleMoves(gameDoc)
+		// gameState := game.extractGameStateVector(gameState)
+		// possibleMoves := game.extractPossibleMoves(gameState)
 
 		// bestMove := game.ChooseBestMove(gameState, possibleMoves)
 
@@ -88,10 +86,8 @@ func (game Game) handleChanges(changes Changes) {
 
 }
 
-func (game Game) isOurTurn(gameDoc Document) bool {
-	activeTeamRaw := gameDoc["activeTeam"]
-	activeTeam := int(activeTeamRaw.(float64))
-	return activeTeam == game.ourTeamId
+func (game Game) isOurTurn(gameState GameState) bool {
+	return gameState.ActiveTeam == game.ourTeamId
 }
 
 func (game Game) checkGameDocInChanges(changes Changes) bool {
@@ -109,11 +105,11 @@ func (game Game) checkGameDocInChanges(changes Changes) bool {
 	return foundGameDoc
 }
 
-func (game Game) fetchLatestGameDoc() (doc Document, err error) {
-	fetchedDoc := new(Document)
-	err = game.db.Retrieve(GAME_DOC_ID, fetchedDoc)
+func (game Game) fetchLatestGameState() (gameState GameState, err error) {
+	gameStateFetched := &GameState{}
+	err = game.db.Retrieve(GAME_DOC_ID, gameStateFetched)
 	if err == nil {
-		doc = *fetchedDoc
+		gameState = *gameStateFetched
 	}
 	return
 }

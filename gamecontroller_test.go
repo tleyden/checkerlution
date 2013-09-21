@@ -24,20 +24,15 @@ func TestIsOurTurn(t *testing.T) {
 
 	jsonString := `{"_id":"game:checkers","_rev":"3773-aa8a4c5a30b49e1eec65dff6df05561f","activeTeam":0,"channels":["game"],"moveDeadline":"2013-09-20T21:13:35Z","moveInterval":30,"moves":[{"game":153563,"locations":[10,14],"piece":9,"team":0,"turn":1},{"game":153563,"locations":[23,19],"piece":2,"team":1,"turn":2}],"number":153563,"startTime":"2013-09-20T17:11:53Z","teams":[{"participantCount":1,"pieces":[{"location":1},{"location":2},{"location":3},{"location":4},{"location":5},{"location":6,"validMoves":[{"captures":[],"king":false,"locations":[10]}]},{"location":7,"validMoves":[{"captures":[],"king":false,"locations":[10]}]},{"location":8},{"location":9,"validMoves":[{"captures":[],"king":false,"locations":[13]}]},{"location":14,"validMoves":[{"captures":[],"king":false,"locations":[17]},{"captures":[],"king":false,"locations":[18]}]},{"location":11,"validMoves":[{"captures":[],"king":false,"locations":[15]},{"captures":[],"king":false,"locations":[16]}]},{"location":12,"validMoves":[{"captures":[],"king":false,"locations":[16]}]}]},{"participantCount":0,"pieces":[{"location":21},{"location":22},{"location":19},{"location":24},{"location":25},{"location":26},{"location":27},{"location":28},{"location":29},{"location":30},{"location":31},{"location":32}]}],"turn":3,"votesDoc":"votes:checkers"}`
 
-	jsonBytes := []byte(jsonString)
-	gameDoc := new(Document)
-	err := json.Unmarshal(jsonBytes, gameDoc)
-	if err != nil {
-		log.Fatal(err)
-	}
+	gameState := NewGameStateFromString(jsonString)
 
 	game := &Game{ourTeamId: 0}
 	game.InitGame()
-	result := game.isOurTurn(*gameDoc)
+	result := game.isOurTurn(gameState)
 	assert.True(t, result)
 
 	game.ourTeamId = 1
-	assert.False(t, game.isOurTurn(*gameDoc))
+	assert.False(t, game.isOurTurn(gameState))
 
 }
 
@@ -89,17 +84,6 @@ func TestCheckGameDocInChanges(t *testing.T) {
 	result := game.checkGameDocInChanges(*changes)
 	assert.True(t, result)
 
-}
-
-func DISTestFetchLatestGameDocument(t *testing.T) {
-	game := &Game{}
-	game.InitGame()
-	gameDoc, err := game.fetchLatestGameDoc()
-	if err != nil {
-		logg.Log("gameDoc: %v.  err: %v", gameDoc, err)
-		panic("err")
-	}
-	logg.Log("gameDoc: %v.  err: %v", gameDoc, err)
 }
 
 func TestChooseBestMove(t *testing.T) {
