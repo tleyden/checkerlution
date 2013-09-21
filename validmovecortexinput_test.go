@@ -13,21 +13,6 @@ func init() {
 	logg.LogKeys["TEST"] = true
 }
 
-/*
-func FakeValidMove() ValidMove {
-	jsonString := `{"locations":[1],"captures":[{"team":1,"piece":11}],"king":true}`
-
-	validMovePtr := &ValidMove{}
-	jsonBytes := []byte(jsonString)
-	err := json.Unmarshal(jsonBytes, validMovePtr)
-	if err != nil {
-		logg.LogError(err)
-	}
-	validMove := *validMovePtr
-	return validMove
-}
-*/
-
 func FakePiece() Piece {
 	jsonString := `{"location":7,"validMoves":[{"locations":[1],"captures":[{"team":1,"piece":11}],"king":true}]}`
 
@@ -44,7 +29,6 @@ func FakePiece() Piece {
 
 func TestNewValidMoveCortexInput(t *testing.T) {
 
-	// validMove := FakeValidMove()
 	piece := FakePiece()
 	validMove := piece.ValidMoves[0]
 
