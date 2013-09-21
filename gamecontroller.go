@@ -158,13 +158,13 @@ func (game *Game) InitDbConnection() {
 	game.db = db
 }
 
-func (game *Game) ChooseBestMove(gameState []float64, possibleMoves []ValidMoveCortexInput) (bestMove ValidMoveCortexInput) {
+func (game *Game) ChooseBestMove(gameStateVector GameStateVector, possibleMoves []ValidMoveCortexInput) (bestMove ValidMoveCortexInput) {
 
 	// Todo: the code below is an implementation of a single MoveChooser
 	// but an interface should be designed so this is pluggable
 
-	game.currentGameState = gameState
-	logg.LogTo("MAIN", "gameState: %v", gameState)
+	game.currentGameState = gameStateVector
+	logg.LogTo("MAIN", "gameStateVector: %v", gameStateVector)
 
 	var bestMoveRating []float64
 	bestMoveRating = []float64{-1000000000}

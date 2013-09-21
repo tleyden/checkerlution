@@ -140,7 +140,7 @@ func FakeGameJson() string {
 
 func FakeGameDocument() (gameState []float64, possibleMoves []ValidMoveCortexInput) {
 
-	gameState = make([]float64, 32)
+	gameState = NewGameStateVector()
 
 	possibleMove1 := ValidMoveCortexInput{
 		startLocation:   0,
