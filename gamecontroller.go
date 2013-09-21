@@ -75,7 +75,9 @@ func (game Game) handleChanges(changes Changes) {
 
 		logg.LogTo("DEBUG", "possibleMoves: %v", possibleMoves)
 
-		// bestMove := game.ChooseBestMove(gameState, possibleMoves)
+		bestMove := game.ChooseBestMove(gameStateVector, possibleMoves)
+
+		logg.LogTo("DEBUG", "bestMove: %v", bestMove)
 
 		// game.PostChosenMove(bestMove)
 
