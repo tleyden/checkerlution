@@ -78,6 +78,11 @@ func (game *Game) handleChanges(changes Changes) {
 
 		possibleMoves := game.extractPossibleMoves(gameState)
 
+		if len(possibleMoves) == 0 {
+			logg.LogTo("MAIN", "No possibleMoves, ignoring changes")
+			return
+		}
+
 		logg.LogTo("DEBUG", "possibleMoves: %v", possibleMoves)
 
 		bestMove := game.ChooseBestMove(gameStateVector, possibleMoves)
@@ -201,50 +206,13 @@ func (game *Game) ChooseBestMove(gameStateVector GameStateVector, possibleMoves 
 
 }
 
-func (game Game) fetchLatestVotes() (votes *Votes, err error) {
-	votes = &Votes{}
-	err = game.db.Retrieve(VOTES_DOC_ID, votes)
-	return
-}
-
-func dumpVotes(votes *Votes) {
-	json_buf, err := json.Marshal(votes)
-	if err != nil {
-		panic(err)
-	}
-	jsonString := string(json_buf)
-	logg.LogTo("MAIN", "votes json: %v", jsonString)
-}
-
 func (game *Game) PostChosenMove(move ValidMoveCortexInput) {
+
 	logg.LogTo("MAIN", "post chosen move: %v", move.validMove)
-	latestVotes, err := game.fetchLatestVotes()
-	dumpVotes(latestVotes)
-	if err != nil {
-		panic(err)
+
+	if len(move.validMove.Locations) == 0 {
+		logg.LogTo("MAIN", "invalid move, ignoring: %v", move.validMove)
 	}
-	logg.LogTo("MAIN", "votes.moves: %v", latestVotes.Moves)
-	latestVotes.SetMove(move)
-	dumpVotes(latestVotes)
-	logg.LogTo("MAIN", "after setMove, votes: %v", latestVotes)
-	logg.LogTo("MAIN", "after setMove, votes.moves: %v", latestVotes.Moves)
-
-	/**
-
-	{
-	        "turn": 1,
-	        "piece": 11,
-	        "team": 0,
-	        "_id": "vote:FF7D0564-C8B8-4EFA-9E7F-EE95C22A0444",
-	        "_rev": "1-bccce355a34b387394d2f25d2f03bc94",
-	        "game": 157863,
-	        "_revisions": {
-	            "ids": ["bccce355a34b387394d2f25d2f03bc94"],
-	            "start": 1
-	        },
-	        "locations": [12, 16]
-	    }
-	*/
 
 	u4, err := uuid.NewV4()
 	if err != nil {
@@ -254,17 +222,10 @@ func (game *Game) PostChosenMove(move ValidMoveCortexInput) {
 
 	votes := &OutgoingVotes{}
 	votes.Id = fmt.Sprintf("vote:%s", u4)
-	// votes.Rev = "1-bccce355a34b387394d2f25d2f03bc94"
-	revisions := make(map[string]interface{})
-	revisionIds := []string{"bccce355a34b387394d2f25d2f03bc94"}
-	revisions["ids"] = revisionIds
-	revisions["start"] = 1.0
-	// votes.Revisions = revisions
-	votes.Turn = latestVotes.Turn + 1
+	votes.Turn = game.gameState.Turn
 	votes.PieceId = move.validMove.PieceId
 	votes.TeamId = game.ourTeamId
 	votes.GameId = game.gameState.Number
-	// TODO: locations!
 
 	// TODO: this is actually a bug, because if there is a
 	// double jump it will only send the first jump move
