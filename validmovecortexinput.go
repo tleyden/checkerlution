@@ -13,18 +13,52 @@ type ValidMoveCortexInput struct {
 	captureValue    float64 // -1: 0 capture, 0: 1 capture, 1: 2+ captures
 }
 
-func NewValidMoveCortexInput(validMove ValidMove) ValidMoveCortexInput {
-	moveInput := ValidMoveCortexInput{}
+func NewValidMoveCortexInput(validMove ValidMove, piece Piece) ValidMoveCortexInput {
 
+	moveInput := ValidMoveCortexInput{}
+	moveInput.validMove = validMove
+
+	// end location
 	if len(validMove.Locations) > 0 {
 		// the locations array for a valid move can have multiple values,
 		// because of "double jumps".  as s simplification, just look at the
-		// last jump and ignore dump jumps
+		// last jump
 		lastIndex := len(validMove.Locations) - 1
 		endLocation1Based := validMove.Locations[lastIndex]
 		endLocation0Based := endLocation1Based - 1
 		endLocation := float64(endLocation0Based)
 		moveInput.endLocation = moveInput.normalize(endLocation)
+	}
+
+	// is king
+	switch piece.King {
+	case true:
+		moveInput.isCurrentlyKing = 1.0
+	case false:
+		moveInput.isCurrentlyKing = -1.0
+	}
+
+	// start location
+	startLocation0Based := piece.Location - 1
+	startLocation := float64(startLocation0Based)
+	moveInput.startLocation = moveInput.normalize(startLocation)
+
+	// will become king
+	switch validMove.King {
+	case true:
+		moveInput.willBecomeKing = 1.0
+	case false:
+		moveInput.willBecomeKing = -1.0
+	}
+
+	// capture value
+	switch len(validMove.Captures) {
+	case 0:
+		moveInput.captureValue = -1.0
+	case 1:
+		moveInput.captureValue = 0.0
+	default:
+		moveInput.captureValue = 1.0
 	}
 
 	return moveInput

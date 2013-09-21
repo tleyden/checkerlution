@@ -13,8 +13,8 @@ func init() {
 	logg.LogKeys["TEST"] = true
 }
 
-func TestNewValidMoveCortexInput(t *testing.T) {
-
+/*
+func FakeValidMove() ValidMove {
 	jsonString := `{"locations":[1],"captures":[{"team":1,"piece":11}],"king":true}`
 
 	validMovePtr := &ValidMove{}
@@ -23,14 +23,39 @@ func TestNewValidMoveCortexInput(t *testing.T) {
 	if err != nil {
 		logg.LogError(err)
 	}
-
 	validMove := *validMovePtr
-	vmCortexInput := NewValidMoveCortexInput(validMove)
+	return validMove
+}
+*/
+
+func FakePiece() Piece {
+	jsonString := `{"location":7,"validMoves":[{"locations":[1],"captures":[{"team":1,"piece":11}],"king":true}]}`
+
+	piecePtr := &Piece{}
+	jsonBytes := []byte(jsonString)
+	err := json.Unmarshal(jsonBytes, piecePtr)
+	if err != nil {
+		logg.LogError(err)
+	}
+	piece := *piecePtr
+	return piece
+
+}
+
+func TestNewValidMoveCortexInput(t *testing.T) {
+
+	// validMove := FakeValidMove()
+	piece := FakePiece()
+	validMove := piece.ValidMoves[0]
+
+	vmCortexInput := NewValidMoveCortexInput(validMove, piece)
 	endLocationNormalized := vmCortexInput.endLocation
 	expected := -1.0
 	logg.LogTo("TEST", "endLocationNormalized: %v", endLocationNormalized)
 
 	assert.True(t, ng.EqualsWithMaxDelta(endLocationNormalized, expected, 0.1))
+	assert.True(t, ng.EqualsWithMaxDelta(vmCortexInput.willBecomeKing, 1.0, 0.1))
+	assert.True(t, ng.EqualsWithMaxDelta(vmCortexInput.captureValue, 0.0, 0.1))
 
 	logg.LogTo("TEST", "vmCortexInput: %v", vmCortexInput)
 
