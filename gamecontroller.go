@@ -81,6 +81,32 @@ func (game Game) handleChanges(changes Changes) {
 
 }
 
+func (game Game) extractPossibleMoves(gameState GameState) []ValidMoveCortexInput {
+
+	moves := make([]ValidMoveCortexInput, 0)
+
+	opponentTeamId := game.opponentTeamId()
+	opponentTeam := gameState.Teams[opponentTeamId]
+
+	for _, piece := range opponentTeam.Pieces {
+		for _, validMove := range piece.ValidMoves {
+			moveInput := NewValidMoveCortexInput(validMove, piece)
+			moves = append(moves, moveInput)
+		}
+	}
+
+	return moves
+}
+
+func (game Game) opponentTeamId() int {
+	switch game.ourTeamId {
+	case 0:
+		return 1
+	default:
+		return 0
+	}
+}
+
 func (game Game) extractGameStateVector(gameState GameState) GameStateVector {
 	gameStateVector := NewGameStateVector()
 	gameStateVector.loadFromGameState(gameState, game.ourTeamId)
