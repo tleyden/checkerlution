@@ -12,6 +12,7 @@ import (
 
 const SERVER_URL = "http://localhost:4984/checkers"
 const GAME_DOC_ID = "game:checkers"
+const VOTES_DOC_ID = "votes:checkers"
 
 type Game struct {
 	cortex               *ng.Cortex
@@ -91,7 +92,8 @@ func (game Game) extractPossibleMoves(gameState GameState) []ValidMoveCortexInpu
 
 	ourTeam := gameState.Teams[game.ourTeamId]
 
-	for _, piece := range ourTeam.Pieces {
+	for pieceIndex, piece := range ourTeam.Pieces {
+		piece.PieceId = pieceIndex
 		for _, validMove := range piece.ValidMoves {
 			moveInput := NewValidMoveCortexInput(validMove, piece)
 			moves = append(moves, moveInput)
@@ -195,8 +197,20 @@ func (game *Game) ChooseBestMove(gameStateVector GameStateVector, possibleMoves 
 
 }
 
+func (game Game) fetchLatestVotes() (votes *Votes, err error) {
+	votes = &Votes{}
+	err = game.db.Retrieve(VOTES_DOC_ID, votes)
+	return
+}
+
 func (game *Game) PostChosenMove(move ValidMoveCortexInput) {
-	logg.LogTo("MAIN", "chosen move: %v", move)
+	logg.LogTo("MAIN", "post chosen move: %v", move)
+	votes, err := game.fetchLatestVotes()
+	if err != nil {
+		panic(err)
+	}
+	votes.SetMove(move)
+	logg.LogTo("MAIN", "votes: %v", votes)
 }
 
 func (game *Game) CreateNeurgoCortex() {

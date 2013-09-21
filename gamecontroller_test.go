@@ -55,8 +55,10 @@ func TestExtractPossibleMoves(t *testing.T) {
 
 	possibleMoves := game.extractPossibleMoves(gameState)
 
-	logg.LogTo("TEST", "possibleMoves: %v len: %v", possibleMoves, len(possibleMoves))
+	possibleMove := possibleMoves[0]
 
+	assert.Equals(t, possibleMove.validMove.StartLocation, 7)
+	assert.Equals(t, possibleMove.validMove.PieceId, 6)
 	assert.Equals(t, len(possibleMoves), 8)
 
 }

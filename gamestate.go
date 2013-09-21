@@ -27,6 +27,7 @@ type Piece struct {
 	King       bool        `json:"king"`
 	Captured   bool        `json:"captured"`
 	ValidMoves []ValidMove `json:"validMoves"`
+	PieceId    int
 }
 
 type Team struct {
@@ -36,9 +37,11 @@ type Team struct {
 }
 
 type ValidMove struct {
-	Locations []int     `json:"locations"`
-	Captures  []Capture `json:"captures"`
-	King      bool      `json:"king"`
+	Locations     []int     `json:"locations"`
+	Captures      []Capture `json:"captures"`
+	King          bool      `json:"king"`
+	PieceId       int
+	StartLocation int
 }
 
 type Capture struct {
