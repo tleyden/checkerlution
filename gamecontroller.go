@@ -12,9 +12,13 @@ import (
 	"time"
 )
 
-const SERVER_URL = "http://localhost:4984/checkers"
-const GAME_DOC_ID = "game:checkers"
-const VOTES_DOC_ID = "votes:checkers"
+const (
+	SERVER_URL   = "http://localhost:4984/checkers"
+	GAME_DOC_ID  = "game:checkers"
+	VOTES_DOC_ID = "votes:checkers"
+	RED_TEAM     = 0
+	BLUE_TEAM    = 1
+)
 
 type Game struct {
 	cortex               *ng.Cortex
@@ -27,6 +31,11 @@ type Game struct {
 }
 
 type Changes map[string]interface{}
+
+func NewGame(ourTeamId int) *Game {
+	game := &Game{ourTeamId: ourTeamId}
+	return game
+}
 
 // Follow the changes feed and on each change callback
 // call game.handleChanges() which will drive the game
@@ -114,10 +123,10 @@ func (game Game) extractPossibleMoves(gameState GameState) []ValidMoveCortexInpu
 
 func (game Game) opponentTeamId() int {
 	switch game.ourTeamId {
-	case 0:
-		return 1
+	case RED_TEAM:
+		return BLUE_TEAM
 	default:
-		return 0
+		return RED_TEAM
 	}
 }
 
