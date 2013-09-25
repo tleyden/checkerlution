@@ -1,11 +1,11 @@
 package checkerlution
 
 import (
-	"code.google.com/p/dsallings-couch-go"
 	"encoding/json"
 	"fmt"
 	"github.com/couchbaselabs/logg"
 	"github.com/nu7hatch/gouuid"
+	"github.com/tleyden/dsallings-couch-go"
 	ng "github.com/tleyden/neurgo"
 	"io"
 	"strings"
