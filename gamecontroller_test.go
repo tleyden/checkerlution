@@ -36,7 +36,6 @@ func TestIsOurTurn(t *testing.T) {
 	gameState := NewGameStateFromString(jsonString)
 
 	game := &Game{ourTeamId: 0}
-	game.InitGame()
 	result := game.isOurTurn(gameState)
 	assert.True(t, result)
 
@@ -51,7 +50,6 @@ func TestExtractPossibleMoves(t *testing.T) {
 	gameState := NewGameStateFromString(jsonString)
 
 	game := &Game{ourTeamId: 0}
-	game.InitGame()
 
 	possibleMoves := game.extractPossibleMoves(gameState)
 
@@ -70,7 +68,6 @@ func TestExtractGameStateVector(t *testing.T) {
 	gameState := NewGameStateFromString(jsonString)
 
 	game := &Game{ourTeamId: 0}
-	game.InitGame()
 
 	gameStateVector := game.extractGameStateVector(gameState)
 
@@ -96,7 +93,6 @@ func TestCheckGameDocInChanges(t *testing.T) {
 	}
 
 	game := &Game{}
-	game.InitGame()
 	result := game.checkGameDocInChanges(*changes)
 	assert.True(t, result)
 
