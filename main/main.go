@@ -1,14 +1,14 @@
 package main
 
 import (
+	"github.com/couchbaselabs/logg"
 	"github.com/tleyden/checkerlution"
 	ng "github.com/tleyden/neurgo"
-	"log"
 )
 
 func main() {
 
-	log.Printf("hello")
+	logg.LogKeys["MAIN"] = true
 
 	ng.SeedRandom()
 
