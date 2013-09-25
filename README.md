@@ -1,7 +1,7 @@
 
 A "checkers bot" which connects to a [Checkers Overlord](https://github.com/apage43/checkers-overlord) server and uses [neurgo](https://github.com/tleyden/neurgo) to do it's thinking (or lack thereof).
 
-![screenshot](http://cl.ly/image/070z1n2q1P35/Screen%20Shot%202013-09-25%20at%2012.46.27%20AM.png)
+![screenshot](http://cl.ly/image/1w423h062S1d/Screen%20Shot%202013-09-25%20at%2012.46.27%20AM.png)
 
 # Architecture
 
