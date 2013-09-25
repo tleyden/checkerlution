@@ -1,5 +1,45 @@
 
-A "checkers bot" which uses [neurgo](https://github.com/tleyden/neurgo) to do it's thinking (or lack thereof).
+A "checkers bot" which connects to a [Checkers Overlord](https://github.com/apage43/checkers-overlord) server and uses [neurgo](https://github.com/tleyden/neurgo) to do it's thinking (or lack thereof).
+
+![screenshot](http://cl.ly/image/070z1n2q1P35/Screen%20Shot%202013-09-25%20at%2012.46.27%20AM.png)
+
+# Architecture
+
+![architecture png](http://cl.ly/image/3v3N2G3X192h/architecture.png)
+
+# Install pre-requisites
+
+* Go 1.1 or later
+
+# Install checkerlution
+
+```
+$ go get github.com/tleyden/checkerlution
+$ go get github.com/couchbaselabs/go.assert
+```
+# Validate installation - run tests
+
+```
+$ cd $GOPATH/github.com/tleyden/checkerlution
+$ go test -v
+```
+
+# Install Couchbase Server
+
+# Install [Sync Gateway](https://github.com/couchbase/sync_gateway)
+
+# Install [Checkers Overlord](https://github.com/apage43/checkers-overlord)
+
+# Configure checkerlution
+
+Edit SERVER_URL in gamecontroller.go to point the Sync Gateway you want to test against.
+
+# Run checkerlution
+
+```
+$ cd $GOPATH/github.com/tleyden/checkerlution/main
+$ go run main.go
+```
 
 # How it's modeled
 
