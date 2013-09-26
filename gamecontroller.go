@@ -407,6 +407,9 @@ func (game *Game) calculatePreMoveSleepSeconds() float64 {
 	// cap the minimum amount we sleep at 10% of the move interval
 	minSleep := float64(game.gameState.MoveInterval) * 0.10
 
-	return ng.RandomInRange(minSleep, float64(game.gameState.MoveInterval))
+	// likewise, don't want to cut it to close to the timeout
+	maxSleep := float64(game.gameState.MoveInterval) * 0.90
+
+	return ng.RandomInRange(minSleep, maxSleep)
 
 }
