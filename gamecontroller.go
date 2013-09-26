@@ -28,6 +28,7 @@ type Game struct {
 	latestActuatorOutput []float64
 	ourTeamId            int
 	db                   couch.Database
+	user                 User
 }
 
 type Changes map[string]interface{}
@@ -58,7 +59,21 @@ func (game *Game) GameLoop() {
 
 }
 
-// - (optional) make sure one of the changes is a game, if not, ignore it
+func (game *Game) updateUserGameNumber(gameState GameState) {
+	gameNumberChanged := (game.gameState.Number != gameState.Number)
+	if gameNumberChanged {
+		game.user.GameNumber = gameState.Number
+		newRevision, err := game.db.Edit(game.user)
+		if err != nil {
+			logg.LogError(err)
+			return
+		}
+		logg.LogTo("MAIN", "user update, rev: %v", newRevision)
+	}
+
+}
+
+// - make sure one of the changes is a game, if not, ignore it
 // - get the latest game document
 // - if it's not our turn, do nothing
 // - if it is our turn
@@ -70,6 +85,7 @@ func (game *Game) handleChanges(changes Changes) {
 	gameDocChanged := game.checkGameDocInChanges(changes)
 	if gameDocChanged {
 		gameState, err := game.fetchLatestGameState()
+		game.updateUserGameNumber(gameState)
 		game.gameState = gameState
 		if err != nil {
 			logg.LogError(err)
@@ -169,6 +185,26 @@ func (game *Game) InitGame() {
 	cortex := game.cortex
 	cortex.Run()
 	game.InitDbConnection()
+	game.CreateRemoteUser()
+}
+
+func (game *Game) CreateRemoteUser() {
+
+	u4, err := uuid.NewV4()
+	if err != nil {
+		logg.LogPanic("Error generating uuid", err)
+	}
+
+	user := &User{
+		Id:     fmt.Sprintf("user:%s", u4),
+		TeamId: game.ourTeamId,
+	}
+	newId, newRevision, err := game.db.Insert(user)
+	logg.LogTo("MAIN", "Inserted new user %v rev %v", newId, newRevision)
+
+	user.Rev = newRevision
+	game.user = *user
+
 }
 
 func (game *Game) InitDbConnection() {
@@ -220,6 +256,9 @@ func (game *Game) PostChosenMove(move ValidMoveCortexInput) {
 	logg.LogTo("MAIN", "post chosen move: %v", move.validMove)
 
 	preMoveSleepSeconds := game.calculatePreMoveSleepSeconds()
+
+	logg.LogTo("MAIN", "sleep %v (s) before posting move", preMoveSleepSeconds)
+
 	time.Sleep(time.Second * time.Duration(preMoveSleepSeconds))
 
 	if len(move.validMove.Locations) == 0 {
@@ -228,8 +267,7 @@ func (game *Game) PostChosenMove(move ValidMoveCortexInput) {
 
 	u4, err := uuid.NewV4()
 	if err != nil {
-		logg.LogError(err)
-		return
+		logg.LogPanic("Error generating uuid", err)
 	}
 
 	votes := &OutgoingVotes{}
