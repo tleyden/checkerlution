@@ -219,6 +219,9 @@ func (game *Game) PostChosenMove(move ValidMoveCortexInput) {
 
 	logg.LogTo("MAIN", "post chosen move: %v", move.validMove)
 
+	preMoveSleepSeconds := game.calculatePreMoveSleepSeconds()
+	time.Sleep(time.Second * time.Duration(preMoveSleepSeconds))
+
 	if len(move.validMove.Locations) == 0 {
 		logg.LogTo("MAIN", "invalid move, ignoring: %v", move.validMove)
 	}
@@ -358,4 +361,14 @@ func calculateNextSinceValue(curSinceValue string, changes Changes) string {
 		return lastSeqAsString
 	}
 	return curSinceValue
+}
+
+func (game *Game) calculatePreMoveSleepSeconds() float64 {
+
+	// we don't want to make a move "too soon", so lets
+	// cap the minimum amount we sleep at 10% of the move interval
+	minSleep := float64(game.gameState.MoveInterval) * 0.10
+
+	return ng.RandomInRange(minSleep, float64(game.gameState.MoveInterval))
+
 }

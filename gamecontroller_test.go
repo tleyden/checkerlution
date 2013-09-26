@@ -98,6 +98,14 @@ func TestCheckGameDocInChanges(t *testing.T) {
 
 }
 
+func TestCalculatePreMoveSleepSeconds(t *testing.T) {
+	game := &Game{}
+	game.gameState.MoveInterval = 30
+	preMoveSleepSeconds := game.calculatePreMoveSleepSeconds()
+	assert.True(t, preMoveSleepSeconds > 0)
+	assert.True(t, preMoveSleepSeconds <= 30)
+}
+
 func TestChooseBestMove(t *testing.T) {
 
 	ng.SeedRandom()
