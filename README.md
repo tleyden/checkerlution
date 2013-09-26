@@ -1,3 +1,5 @@
+[![Build Status](https://drone.io/github.com/tleyden/checkerlution/status.png)](https://drone.io/github.com/tleyden/checkerlution/latest)
+
 
 A "checkers bot" which connects to a [Checkers Overlord](https://github.com/apage43/checkers-overlord) server and uses [neurgo](https://github.com/tleyden/neurgo) to do it's thinking (or lack thereof).
 
