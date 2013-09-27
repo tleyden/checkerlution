@@ -59,20 +59,6 @@ func (game *Game) GameLoop() {
 
 }
 
-func (game *Game) updateUserGameNumber(gameState GameState) {
-	gameNumberChanged := (game.gameState.Number != gameState.Number)
-	if gameNumberChanged {
-		game.user.GameNumber = gameState.Number
-		newRevision, err := game.db.Edit(game.user)
-		if err != nil {
-			logg.LogError(err)
-			return
-		}
-		logg.LogTo("MAIN", "user update, rev: %v", newRevision)
-	}
-
-}
-
 // - make sure one of the changes is a game, if not, ignore it
 // - get the latest game document
 // - if it's not our turn, do nothing
@@ -116,6 +102,20 @@ func (game *Game) handleChanges(changes Changes) {
 
 		game.PostChosenMove(bestMove)
 
+	}
+
+}
+
+func (game *Game) updateUserGameNumber(gameState GameState) {
+	gameNumberChanged := (game.gameState.Number != gameState.Number)
+	if gameNumberChanged {
+		game.user.GameNumber = gameState.Number
+		newRevision, err := game.db.Edit(game.user)
+		if err != nil {
+			logg.LogError(err)
+			return
+		}
+		logg.LogTo("MAIN", "user update, rev: %v", newRevision)
 	}
 
 }
