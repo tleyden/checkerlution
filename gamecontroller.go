@@ -6,8 +6,8 @@ import (
 	"github.com/couchbaselabs/logg"
 	"github.com/nu7hatch/gouuid"
 	"github.com/tleyden/dsallings-couch-go"
-	ng "github.com/tleyden/neurgo"
 	"io"
+	"math/rand"
 	"strings"
 	"time"
 )
@@ -21,14 +21,11 @@ const (
 )
 
 type Game struct {
-	cortex               *ng.Cortex
-	currentGameState     GameStateVector
-	gameState            GameState
-	currentPossibleMove  ValidMoveCortexInput
-	latestActuatorOutput []float64
-	ourTeamId            int
-	db                   couch.Database
-	user                 User
+	thinker   Thinker
+	gameState GameState
+	ourTeamId int
+	db        couch.Database
+	user      User
 }
 
 type Changes map[string]interface{}
@@ -63,11 +60,9 @@ func (game *Game) GameLoop() {
 // - get the latest game document
 // - if it's not our turn, do nothing
 // - if it is our turn
-//   - parse out the required data structures needed to pass to cortex
-//   - call cortex to calculate next move
+//   - call thinker to calculate next move
 //   - make next move by inserting a new revision of votes doc
 func (game *Game) handleChanges(changes Changes) {
-	logg.LogTo("DEBUG", "handleChanges called with %v", changes)
 	gameDocChanged := game.checkGameDocInChanges(changes)
 	if gameDocChanged {
 		gameState, err := game.fetchLatestGameState()
@@ -77,113 +72,21 @@ func (game *Game) handleChanges(changes Changes) {
 			logg.LogError(err)
 			return
 		}
-		logg.LogTo("DEBUG", "gameState: %v", gameState)
 		if isOurTurn := game.isOurTurn(gameState); !isOurTurn {
 			logg.LogTo("DEBUG", "It's not our turn, ignoring changes")
 			return
 		}
 
-		gameStateVector := game.extractGameStateVector(gameState)
-
-		logg.LogTo("DEBUG", "gameStateVector: %v", gameStateVector)
-
-		possibleMoves := game.extractPossibleMoves(gameState)
-
-		if len(possibleMoves) == 0 {
-			logg.LogTo("MAIN", "No possibleMoves, ignoring changes")
-			return
-		}
-
-		logg.LogTo("DEBUG", "possibleMoves: %v", possibleMoves)
-
-		bestMove := game.ChooseBestMove(gameStateVector, possibleMoves)
-
-		logg.LogTo("DEBUG", "bestMove: %v", bestMove)
-
+		bestMove := game.thinker.Think(gameState)
 		game.PostChosenMove(bestMove)
 
 	}
-
-}
-
-func (game *Game) updateUserGameNumber(gameState GameState) {
-	gameNumberChanged := (game.gameState.Number != gameState.Number)
-	if gameNumberChanged {
-		game.user.GameNumber = gameState.Number
-		newRevision, err := game.db.Edit(game.user)
-		if err != nil {
-			logg.LogError(err)
-			return
-		}
-		logg.LogTo("MAIN", "user update, rev: %v", newRevision)
-	}
-
-}
-
-func (game Game) extractPossibleMoves(gameState GameState) []ValidMoveCortexInput {
-
-	moves := make([]ValidMoveCortexInput, 0)
-
-	ourTeam := gameState.Teams[game.ourTeamId]
-
-	for pieceIndex, piece := range ourTeam.Pieces {
-		piece.PieceId = pieceIndex
-		for _, validMove := range piece.ValidMoves {
-			moveInput := NewValidMoveCortexInput(validMove, piece)
-			moves = append(moves, moveInput)
-		}
-	}
-
-	return moves
-}
-
-func (game Game) opponentTeamId() int {
-	switch game.ourTeamId {
-	case RED_TEAM:
-		return BLUE_TEAM
-	default:
-		return RED_TEAM
-	}
-}
-
-func (game Game) extractGameStateVector(gameState GameState) GameStateVector {
-	gameStateVector := NewGameStateVector()
-	gameStateVector.loadFromGameState(gameState, game.ourTeamId)
-	return gameStateVector
-}
-
-func (game Game) isOurTurn(gameState GameState) bool {
-	return gameState.ActiveTeam == game.ourTeamId
-}
-
-func (game Game) checkGameDocInChanges(changes Changes) bool {
-	foundGameDoc := false
-	changeResultsRaw := changes["results"]
-	changeResults := changeResultsRaw.([]interface{})
-	for _, changeResultRaw := range changeResults {
-		changeResult := changeResultRaw.(map[string]interface{})
-		docIdRaw := changeResult["id"]
-		docId := docIdRaw.(string)
-		if strings.Contains(docId, GAME_DOC_ID) {
-			foundGameDoc = true
-		}
-	}
-	return foundGameDoc
-}
-
-func (game Game) fetchLatestGameState() (gameState GameState, err error) {
-	gameStateFetched := &GameState{}
-	err = game.db.Retrieve(GAME_DOC_ID, gameStateFetched)
-	if err == nil {
-		gameState = *gameStateFetched
-	}
-	return
 }
 
 func (game *Game) InitGame() {
-	game.CreateNeurgoCortex()
-	cortex := game.cortex
-	cortex.Run()
+
+	game.thinker = &Checkerlution{}
+	game.thinker.Start(*game)
 	game.InitDbConnection()
 	game.CreateRemoteUser()
 }
@@ -215,45 +118,9 @@ func (game *Game) InitDbConnection() {
 	game.db = db
 }
 
-func (game *Game) ChooseBestMove(gameStateVector GameStateVector, possibleMoves []ValidMoveCortexInput) (bestMove ValidMoveCortexInput) {
+func (game *Game) PostChosenMove(validMove ValidMove) {
 
-	// Todo: the code below is an implementation of a single MoveChooser
-	// but an interface should be designed so this is pluggable
-
-	game.currentGameState = gameStateVector
-	logg.LogTo("MAIN", "gameStateVector: %v", gameStateVector)
-
-	var bestMoveRating []float64
-	bestMoveRating = []float64{-1000000000}
-
-	for _, move := range possibleMoves {
-
-		logg.LogTo("MAIN", "feed possible move to cortex: %v", move)
-
-		// present it to the neural net
-		game.currentPossibleMove = move
-		game.cortex.SyncSensors()
-		game.cortex.SyncActuators()
-
-		logg.LogTo("MAIN", "done sync'ing actuators")
-
-		logg.LogTo("MAIN", "actuator output %v bestMoveRating: %v", game.latestActuatorOutput[0], bestMoveRating[0])
-		if game.latestActuatorOutput[0] > bestMoveRating[0] {
-			logg.LogTo("MAIN", "actuator output > bestMoveRating")
-			bestMove = move
-			bestMoveRating[0] = game.latestActuatorOutput[0]
-		} else {
-			logg.LogTo("MAIN", "actuator output < bestMoveRating, ignoring")
-		}
-
-	}
-	return
-
-}
-
-func (game *Game) PostChosenMove(move ValidMoveCortexInput) {
-
-	logg.LogTo("MAIN", "post chosen move: %v", move.validMove)
+	logg.LogTo("MAIN", "post chosen move: %v", validMove)
 
 	preMoveSleepSeconds := game.calculatePreMoveSleepSeconds()
 
@@ -261,8 +128,8 @@ func (game *Game) PostChosenMove(move ValidMoveCortexInput) {
 
 	time.Sleep(time.Second * time.Duration(preMoveSleepSeconds))
 
-	if len(move.validMove.Locations) == 0 {
-		logg.LogTo("MAIN", "invalid move, ignoring: %v", move.validMove)
+	if len(validMove.Locations) == 0 {
+		logg.LogTo("MAIN", "invalid move, ignoring: %v", validMove)
 	}
 
 	u4, err := uuid.NewV4()
@@ -273,14 +140,14 @@ func (game *Game) PostChosenMove(move ValidMoveCortexInput) {
 	votes := &OutgoingVotes{}
 	votes.Id = fmt.Sprintf("vote:%s", u4)
 	votes.Turn = game.gameState.Turn
-	votes.PieceId = move.validMove.PieceId
+	votes.PieceId = validMove.PieceId
 	votes.TeamId = game.ourTeamId
 	votes.GameId = game.gameState.Number
 
 	// TODO: this is actually a bug, because if there is a
 	// double jump it will only send the first jump move
-	endLocation := move.validMove.Locations[0]
-	locations := []int{move.validMove.StartLocation, endLocation}
+	endLocation := validMove.Locations[0]
+	locations := []int{validMove.StartLocation, endLocation}
 	votes.Locations = locations
 
 	newId, newRevision, err := game.db.Insert(votes)
@@ -293,96 +160,55 @@ func (game *Game) PostChosenMove(move ValidMoveCortexInput) {
 
 }
 
-func (game *Game) CreateNeurgoCortex() {
-
-	nodeId := ng.NewCortexId("cortex")
-	game.cortex = &ng.Cortex{
-		NodeId: nodeId,
+func (game *Game) updateUserGameNumber(gameState GameState) {
+	gameNumberChanged := (game.gameState.Number != gameState.Number)
+	if gameNumberChanged {
+		game.user.GameNumber = gameState.Number
+		newRevision, err := game.db.Edit(game.user)
+		if err != nil {
+			logg.LogError(err)
+			return
+		}
+		logg.LogTo("MAIN", "user update, rev: %v", newRevision)
 	}
-	game.CreateSensors()
-	game.CreateActuator()
-	game.CreateNeuron()
-	game.ConnectNodes()
+
 }
 
-func (game *Game) ConnectNodes() {
+func (game Game) opponentTeamId() int {
+	switch game.ourTeamId {
+	case RED_TEAM:
+		return BLUE_TEAM
+	default:
+		return RED_TEAM
+	}
+}
 
-	cortex := game.cortex
+func (game Game) isOurTurn(gameState GameState) bool {
+	return gameState.ActiveTeam == game.ourTeamId
+}
 
-	cortex.Init()
-
-	// connect sensors -> neuron(s)
-	for _, sensor := range cortex.Sensors {
-		for _, neuron := range cortex.Neurons {
-			sensor.ConnectOutbound(neuron)
-			weights := ng.RandomWeights(sensor.VectorLength)
-			neuron.ConnectInboundWeighted(sensor, weights)
+func (game Game) checkGameDocInChanges(changes Changes) bool {
+	foundGameDoc := false
+	changeResultsRaw := changes["results"]
+	changeResults := changeResultsRaw.([]interface{})
+	for _, changeResultRaw := range changeResults {
+		changeResult := changeResultRaw.(map[string]interface{})
+		docIdRaw := changeResult["id"]
+		docId := docIdRaw.(string)
+		if strings.Contains(docId, GAME_DOC_ID) {
+			foundGameDoc = true
 		}
 	}
-
-	// connect neuron to actuator
-	for _, neuron := range cortex.Neurons {
-		for _, actuator := range cortex.Actuators {
-			neuron.ConnectOutbound(actuator)
-			actuator.ConnectInbound(neuron)
-		}
-	}
-
+	return foundGameDoc
 }
 
-func (game *Game) CreateNeuron() {
-	neuron := &ng.Neuron{
-		ActivationFunction: ng.EncodableSigmoid(),
-		NodeId:             ng.NewNeuronId("Neuron", 0.25),
-		Bias:               ng.RandomBias(),
+func (game Game) fetchLatestGameState() (gameState GameState, err error) {
+	gameStateFetched := &GameState{}
+	err = game.db.Retrieve(GAME_DOC_ID, gameStateFetched)
+	if err == nil {
+		gameState = *gameStateFetched
 	}
-	game.cortex.SetNeurons([]*ng.Neuron{neuron})
-}
-
-func (game *Game) CreateActuator() {
-
-	actuatorNodeId := ng.NewActuatorId("Actuator", 0.5)
-	actuatorFunc := func(outputs []float64) {
-		logg.LogTo("MAIN", "actuator func called with: %v", outputs)
-		game.latestActuatorOutput = outputs
-		game.cortex.SyncChan <- actuatorNodeId // TODO: this should be in actuator itself, not in this function
-	}
-	actuator := &ng.Actuator{
-		NodeId:           actuatorNodeId,
-		VectorLength:     1,
-		ActuatorFunction: actuatorFunc,
-	}
-	game.cortex.SetActuators([]*ng.Actuator{actuator})
-
-}
-
-func (game *Game) CreateSensors() {
-
-	sensorLayer := 0.0
-
-	sensorFuncGameState := func(syncCounter int) []float64 {
-		logg.LogTo("MAIN", "sensor func game state called")
-		return game.currentGameState
-	}
-	sensorGameStateNodeId := ng.NewSensorId("SensorGameState", sensorLayer)
-	sensorGameState := &ng.Sensor{
-		NodeId:         sensorGameStateNodeId,
-		VectorLength:   32,
-		SensorFunction: sensorFuncGameState,
-	}
-
-	sensorFuncPossibleMove := func(syncCounter int) []float64 {
-		logg.LogTo("MAIN", "sensor func possible move called")
-		return game.currentPossibleMove.VectorRepresentation()
-	}
-	sensorPossibleMoveNodeId := ng.NewSensorId("SensorPossibleMove", sensorLayer)
-	sensorPossibleMove := &ng.Sensor{
-		NodeId:         sensorPossibleMoveNodeId,
-		VectorLength:   5, // start_location, is_king, final_location, will_be_king, amt_would_capture
-		SensorFunction: sensorFuncPossibleMove,
-	}
-	game.cortex.SetSensors([]*ng.Sensor{sensorGameState, sensorPossibleMove})
-
+	return
 }
 
 func decodeChanges(reader io.Reader) Changes {
@@ -410,6 +236,11 @@ func (game *Game) calculatePreMoveSleepSeconds() float64 {
 	// likewise, don't want to cut it to close to the timeout
 	maxSleep := float64(game.gameState.MoveInterval) * 0.90
 
-	return ng.RandomInRange(minSleep, maxSleep)
+	return randomInRange(minSleep, maxSleep)
 
+}
+
+func randomInRange(min, max float64) float64 {
+
+	return rand.Float64()*(max-min) + min
 }
