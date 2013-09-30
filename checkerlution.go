@@ -21,7 +21,7 @@ func (c *Checkerlution) Start(game Game) {
 
 }
 
-func (c Checkerlution) Think(gameState GameState) (bestMove ValidMove) {
+func (c *Checkerlution) Think(gameState GameState) (bestMove ValidMove) {
 
 	gameStateVector := c.extractGameStateVector(gameState)
 	possibleMoves := c.extractPossibleMoves(gameState)
