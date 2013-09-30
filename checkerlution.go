@@ -6,15 +6,15 @@ import (
 )
 
 type Checkerlution struct {
-	game                 Game
+	ourTeamId            int
 	cortex               *ng.Cortex
 	currentGameState     GameStateVector
 	currentPossibleMove  ValidMoveCortexInput
 	latestActuatorOutput []float64
 }
 
-func (c *Checkerlution) Start(game Game) {
-	c.game = game
+func (c *Checkerlution) Start(ourTeamId int) {
+	c.ourTeamId = ourTeamId
 	c.CreateNeurgoCortex()
 	cortex := c.cortex
 	cortex.Run()
@@ -36,7 +36,7 @@ func (c *Checkerlution) Think(gameState GameState) (bestMove ValidMove) {
 
 func (c Checkerlution) extractGameStateVector(gameState GameState) GameStateVector {
 	gameStateVector := NewGameStateVector()
-	gameStateVector.loadFromGameState(gameState, c.game.ourTeamId)
+	gameStateVector.loadFromGameState(gameState, c.ourTeamId)
 	return gameStateVector
 }
 
@@ -44,7 +44,7 @@ func (c Checkerlution) extractPossibleMoves(gameState GameState) []ValidMoveCort
 
 	moves := make([]ValidMoveCortexInput, 0)
 
-	ourTeam := gameState.Teams[c.game.ourTeamId]
+	ourTeam := gameState.Teams[c.ourTeamId]
 
 	for pieceIndex, piece := range ourTeam.Pieces {
 		piece.PieceId = pieceIndex

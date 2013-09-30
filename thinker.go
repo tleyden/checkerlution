@@ -1,7 +1,7 @@
 package checkerlution
 
 type Thinker interface {
-	Start(game Game)
+	Start(ourTeamId int)
 	Think(gameState GameState) ValidMove
 	Stop()
 }

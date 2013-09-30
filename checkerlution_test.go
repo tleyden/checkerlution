@@ -13,8 +13,7 @@ func TestExtractPossibleMoves(t *testing.T) {
 	gameState := NewGameStateFromString(jsonString)
 
 	checkerlution := &Checkerlution{}
-	game := &Game{ourTeamId: 0}
-	checkerlution.game = *game
+	checkerlution.ourTeamId = RED_TEAM
 
 	possibleMoves := checkerlution.extractPossibleMoves(gameState)
 
@@ -33,8 +32,7 @@ func TestExtractGameStateVector(t *testing.T) {
 	gameState := NewGameStateFromString(jsonString)
 
 	checkerlution := &Checkerlution{}
-	game := &Game{ourTeamId: 0}
-	checkerlution.game = *game
+	checkerlution.ourTeamId = RED_TEAM
 
 	gameStateVector := checkerlution.extractGameStateVector(gameState)
 
@@ -54,8 +52,7 @@ func TestChooseBestMove(t *testing.T) {
 	logg.LogKeys["MAIN"] = true
 
 	checkerlution := &Checkerlution{}
-	game := &Game{ourTeamId: 0}
-	checkerlution.game = *game
+	checkerlution.ourTeamId = RED_TEAM
 
 	checkerlution.CreateNeurgoCortex()
 	cortex := checkerlution.cortex
