@@ -47,8 +47,17 @@ func (c Checkerlution) extractPossibleMoves(gameState GameState) []ValidMoveCort
 	ourTeam := gameState.Teams[c.ourTeamId]
 
 	for pieceIndex, piece := range ourTeam.Pieces {
-		piece.PieceId = pieceIndex
 		for _, validMove := range piece.ValidMoves {
+
+			// enhance the validMove from some information
+			// from the piece, because this will be required
+			// later when translating this valid move into an
+			// "outgoing move", eg, a move that can be posted
+			// to server to cause it to make.  the outgoing move
+			// is a pretty different format than the orig validMove
+			validMove.StartLocation = piece.Location
+			validMove.PieceId = pieceIndex
+
 			moveInput := NewValidMoveCortexInput(validMove, piece)
 			moves = append(moves, moveInput)
 		}

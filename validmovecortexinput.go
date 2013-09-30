@@ -15,10 +15,6 @@ type ValidMoveCortexInput struct {
 
 func NewValidMoveCortexInput(validMove ValidMove, piece Piece) ValidMoveCortexInput {
 
-	// enhance the validMove from some information from the piece
-	validMove.StartLocation = piece.Location
-	validMove.PieceId = piece.PieceId
-
 	moveInput := ValidMoveCortexInput{}
 	moveInput.validMove = validMove
 
