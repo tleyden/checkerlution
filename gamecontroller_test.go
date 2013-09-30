@@ -43,7 +43,7 @@ func TestCheckGameDocInChanges(t *testing.T) {
 	}
 
 	game := &Game{}
-	result := game.checkGameDocInChanges(*changes)
+	result := game.hasGameDocChanged(*changes)
 	assert.True(t, result)
 
 }

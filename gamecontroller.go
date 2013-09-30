@@ -63,20 +63,19 @@ func (game *Game) GameLoop() {
 //   - call thinker to calculate next move
 //   - make next move by inserting a new revision of votes doc
 func (game *Game) handleChanges(changes Changes) {
-	gameDocChanged := game.checkGameDocInChanges(changes)
+	gameDocChanged := game.hasGameDocChanged(changes)
 	if gameDocChanged {
 		gameState, err := game.fetchLatestGameState()
-		game.updateUserGameNumber(gameState)
-		game.gameState = gameState
 		if err != nil {
 			logg.LogError(err)
 			return
 		}
+		game.updateUserGameNumber(gameState)
+		game.gameState = gameState
 		if isOurTurn := game.isOurTurn(gameState); !isOurTurn {
 			logg.LogTo("DEBUG", "It's not our turn, ignoring changes")
 			return
 		}
-
 		bestMove := game.thinker.Think(gameState)
 		game.PostChosenMove(bestMove)
 
@@ -187,7 +186,7 @@ func (game Game) isOurTurn(gameState GameState) bool {
 	return gameState.ActiveTeam == game.ourTeamId
 }
 
-func (game Game) checkGameDocInChanges(changes Changes) bool {
+func (game Game) hasGameDocChanged(changes Changes) bool {
 	foundGameDoc := false
 	changeResultsRaw := changes["results"]
 	changeResults := changeResultsRaw.([]interface{})
