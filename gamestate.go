@@ -11,7 +11,7 @@ type GameState struct {
 	ActiveTeam   int    `json:"activeTeam"`
 	Number       int    `json:"number"`
 	Turn         int    `json:"turn"`
-	MoveInterval int    `json:""moveInterval""`
+	MoveInterval int    `json:"moveInterval"`
 }
 
 func NewGameStateFromString(jsonString string) GameState {
