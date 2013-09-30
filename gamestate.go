@@ -50,3 +50,19 @@ type Capture struct {
 	TeamID  int `json:"team"`
 	PieceId int `json:"piece"`
 }
+
+func (t Team) AllValidMoves() (validMoves []ValidMove) {
+	validMoves = make([]ValidMove, 0)
+
+	for pieceIndex, piece := range t.Pieces {
+		for _, validMove := range piece.ValidMoves {
+			// enhance the validMove from some information
+			// from the piece
+			validMove.StartLocation = piece.Location
+			validMove.PieceId = pieceIndex
+
+			validMoves = append(validMoves, validMove)
+		}
+	}
+	return
+}

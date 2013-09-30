@@ -7,7 +7,6 @@ import (
 	"github.com/nu7hatch/gouuid"
 	"github.com/tleyden/dsallings-couch-go"
 	"io"
-	"math/rand"
 	"strings"
 	"time"
 )
@@ -84,7 +83,9 @@ func (game *Game) handleChanges(changes Changes) {
 
 func (game *Game) InitGame() {
 
-	game.thinker = &Checkerlution{}
+	// game.thinker = &Checkerlution{}
+	game.thinker = &RandomThinker{}
+
 	game.thinker.Start(game.ourTeamId)
 	game.InitDbConnection()
 	game.CreateRemoteUser()
@@ -237,9 +238,4 @@ func (game *Game) calculatePreMoveSleepSeconds() float64 {
 
 	return randomInRange(minSleep, maxSleep)
 
-}
-
-func randomInRange(min, max float64) float64 {
-
-	return rand.Float64()*(max-min) + min
 }
