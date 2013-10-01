@@ -22,7 +22,7 @@ $ go get github.com/couchbaselabs/go.assert
 # Validate installation - run tests
 
 ```
-$ cd $GOPATH/github.com/tleyden/checkerlution
+$ cd $GOPATH/src/github.com/tleyden/checkerlution
 $ go test -v
 ```
 
