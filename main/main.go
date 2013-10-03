@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/couchbaselabs/logg"
 	"github.com/tleyden/checkerlution"
+	cbot "github.com/tleyden/checkers-bot"
 	ng "github.com/tleyden/neurgo"
 )
 
@@ -12,8 +13,9 @@ func main() {
 
 	ng.SeedRandom()
 
-	redTeam := checkerlution.RED_TEAM
-	game := checkerlution.NewGame(redTeam)
+	thinker := new(checkerlution.Checkerlution)
+	redTeam := cbot.RED_TEAM
+	game := cbot.NewGame(redTeam, thinker)
 	game.GameLoop()
 
 }
