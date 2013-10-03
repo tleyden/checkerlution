@@ -1,5 +1,9 @@
 package checkerlution
 
+import (
+	cbot "github.com/tleyden/checkers-bot"
+)
+
 const OPPONENT_KING = -1.0
 const OPPONENT_PIECE = -0.5
 const EMPTY_SQUARE = 0.0
@@ -25,7 +29,7 @@ func NewGameStateVector() GameStateVector {
 
 }
 
-func (v *GameStateVector) loadFromGameState(gameState GameState, ourTeamId int) {
+func (v *GameStateVector) loadFromGameState(gameState cbot.GameState, ourTeamId int) {
 
 	v2 := *v
 	for teamID, team := range gameState.Teams {

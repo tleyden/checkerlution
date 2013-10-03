@@ -2,6 +2,7 @@ package checkerlution
 
 import (
 	"github.com/couchbaselabs/logg"
+	cbot "github.com/tleyden/checkers-bot"
 	ng "github.com/tleyden/neurgo"
 )
 
@@ -21,7 +22,7 @@ func (c *Checkerlution) Start(ourTeamId int) {
 
 }
 
-func (c *Checkerlution) Think(gameState GameState) (bestMove ValidMove) {
+func (c *Checkerlution) Think(gameState cbot.GameState) (bestMove cbot.ValidMove) {
 
 	gameStateVector := c.extractGameStateVector(gameState)
 	possibleMoves := c.extractPossibleMoves(gameState)
@@ -34,13 +35,13 @@ func (c *Checkerlution) Think(gameState GameState) (bestMove ValidMove) {
 	return
 }
 
-func (c Checkerlution) extractGameStateVector(gameState GameState) GameStateVector {
+func (c Checkerlution) extractGameStateVector(gameState cbot.GameState) GameStateVector {
 	gameStateVector := NewGameStateVector()
 	gameStateVector.loadFromGameState(gameState, c.ourTeamId)
 	return gameStateVector
 }
 
-func (c Checkerlution) extractPossibleMoves(gameState GameState) []ValidMoveCortexInput {
+func (c Checkerlution) extractPossibleMoves(gameState cbot.GameState) []ValidMoveCortexInput {
 
 	moves := make([]ValidMoveCortexInput, 0)
 

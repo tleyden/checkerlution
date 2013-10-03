@@ -3,6 +3,7 @@ package checkerlution
 import (
 	"github.com/couchbaselabs/go.assert"
 	"github.com/couchbaselabs/logg"
+	cbot "github.com/tleyden/checkers-bot"
 	ng "github.com/tleyden/neurgo"
 	"testing"
 )
@@ -10,10 +11,10 @@ import (
 func TestExtractPossibleMoves(t *testing.T) {
 	jsonString := FakeGameJson()
 
-	gameState := NewGameStateFromString(jsonString)
+	gameState := cbot.NewGameStateFromString(jsonString)
 
 	checkerlution := &Checkerlution{}
-	checkerlution.ourTeamId = RED_TEAM
+	checkerlution.ourTeamId = cbot.RED_TEAM
 
 	possibleMoves := checkerlution.extractPossibleMoves(gameState)
 
@@ -29,10 +30,10 @@ func TestExtractGameStateVector(t *testing.T) {
 
 	jsonString := FakeGameJson()
 
-	gameState := NewGameStateFromString(jsonString)
+	gameState := cbot.NewGameStateFromString(jsonString)
 
 	checkerlution := &Checkerlution{}
-	checkerlution.ourTeamId = RED_TEAM
+	checkerlution.ourTeamId = cbot.RED_TEAM
 
 	gameStateVector := checkerlution.extractGameStateVector(gameState)
 
@@ -52,7 +53,7 @@ func TestChooseBestMove(t *testing.T) {
 	logg.LogKeys["MAIN"] = true
 
 	checkerlution := &Checkerlution{}
-	checkerlution.ourTeamId = RED_TEAM
+	checkerlution.ourTeamId = cbot.RED_TEAM
 
 	checkerlution.CreateNeurgoCortex()
 	cortex := checkerlution.cortex

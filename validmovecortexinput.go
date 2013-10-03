@@ -1,11 +1,12 @@
 package checkerlution
 
 import (
+	cbot "github.com/tleyden/checkers-bot"
 	ng "github.com/tleyden/neurgo"
 )
 
 type ValidMoveCortexInput struct {
-	validMove       ValidMove
+	validMove       cbot.ValidMove
 	startLocation   float64
 	isCurrentlyKing float64
 	endLocation     float64
@@ -13,7 +14,7 @@ type ValidMoveCortexInput struct {
 	captureValue    float64 // -1: 0 capture, 0: 1 capture, 1: 2+ captures
 }
 
-func NewValidMoveCortexInput(validMove ValidMove, piece Piece) ValidMoveCortexInput {
+func NewValidMoveCortexInput(validMove cbot.ValidMove, piece cbot.Piece) ValidMoveCortexInput {
 
 	moveInput := ValidMoveCortexInput{}
 	moveInput.validMove = validMove

@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"github.com/couchbaselabs/go.assert"
 	"github.com/couchbaselabs/logg"
+	cbot "github.com/tleyden/checkers-bot"
 	ng "github.com/tleyden/neurgo"
 	"testing"
 )
@@ -12,10 +13,10 @@ func init() {
 	logg.LogKeys["TEST"] = true
 }
 
-func FakePiece() Piece {
+func FakePiece() cbot.Piece {
 	jsonString := `{"location":7,"validMoves":[{"locations":[1],"captures":[{"team":1,"piece":11}],"king":true}]}`
 
-	piecePtr := &Piece{}
+	piecePtr := &cbot.Piece{}
 	jsonBytes := []byte(jsonString)
 	err := json.Unmarshal(jsonBytes, piecePtr)
 	if err != nil {
