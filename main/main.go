@@ -3,7 +3,6 @@ package main
 import (
 	"github.com/couchbaselabs/logg"
 	"github.com/tleyden/checkerlution"
-	cbot "github.com/tleyden/checkers-bot"
 	ng "github.com/tleyden/neurgo"
 	nv "github.com/tleyden/neurvolve"
 )
@@ -18,17 +17,23 @@ func main() {
 	// create a checkerlution instance just to create a cortex (kludgy)
 	thinker := new(checkerlution.Checkerlution)
 	thinker.CreateNeurgoCortex()
-	cortex := thinker.cortex
+	cortex := thinker.Cortex()
 
 	// setup the scape
-	scape := NewCheckerlutionScape()
+	scape := &checkerlution.CheckerlutionScape{}
 
 	// create a stochastic hill climber
 	shc := &nv.StochasticHillClimber{
-		FitnessThreshold:           ng.FITNESS_THRESHOLD,
-		MaxIterationsBeforeRestart: 100,
-		MaxAttempts:                10,
+		FitnessThreshold:           50,
+		MaxIterationsBeforeRestart: 5,
+		MaxAttempts:                1,
 	}
-	cortexTrained, succeeded := shc.TrainScape(cortex)
+	cortexTrained, succeeded := shc.TrainScape(cortex, scape)
+	if succeeded {
+		logg.LogTo("MAIN", "Training succeeded, dumping to file")
+		cortexTrained.MarshalJSONToFile("/tmp/checkerlution.json")
+	} else {
+		logg.LogTo("MAIN", "Training Failed")
+	}
 
 }

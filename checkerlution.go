@@ -60,6 +60,10 @@ func (c *Checkerlution) Think(gameState cbot.GameState) (bestMove cbot.ValidMove
 	return
 }
 
+func (c Checkerlution) Cortex() *ng.Cortex {
+	return c.cortex
+}
+
 func (c Checkerlution) calculateFitness(gameState cbot.GameState) (fitness float64) {
 	weWon := (gameState.WinningTeam == c.ourTeamId)
 	switch weWon {

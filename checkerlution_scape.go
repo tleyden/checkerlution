@@ -9,11 +9,6 @@ import (
 type CheckerlutionScape struct {
 }
 
-func NewCheckerlutionScape() *CheckerlutionScape {
-	scape := &CheckerlutionScape{}
-	return scape
-}
-
 func (scape CheckerlutionScape) Fitness(cortex *ng.Cortex) (fitness float64) {
 
 	// play a game of checkers
