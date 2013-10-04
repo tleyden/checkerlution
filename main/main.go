@@ -9,8 +9,6 @@ import (
 
 func init() {
 	logg.LogKeys["MAIN"] = true
-	logg.LogKeys["NODE_SEND"] = true
-	logg.LogKeys["NODE_RECV"] = true
 	ng.SeedRandom()
 }
 
@@ -19,10 +17,8 @@ func main() {
 	// create a checkerlution instance just to create a cortex (kludgy)
 	thinker := &checkerlution.Checkerlution{}
 	thinker.SetMode(checkerlution.TRAINING_MODE)
-	logg.LogTo("MAIN", "main checkerlution: %v", thinker)
 	thinker.CreateNeurgoCortex()
 	cortex := thinker.Cortex()
-	logg.LogTo("MAIN", "main cortex: %p", cortex)
 
 	// setup the scape
 	scape := &checkerlution.CheckerlutionScape{}
@@ -36,10 +32,11 @@ func main() {
 	}
 	cortexTrained, succeeded := shc.TrainScape(cortex, scape)
 	if succeeded {
-		logg.LogTo("MAIN", "Training succeeded, dumping to file")
-		cortexTrained.MarshalJSONToFile("/tmp/checkerlution.json")
+		logg.LogTo("MAIN", "Training succeeded")
 	} else {
 		logg.LogTo("MAIN", "Training Failed")
 	}
+
+	cortexTrained.MarshalJSONToFile("/tmp/checkerlution.json")
 
 }

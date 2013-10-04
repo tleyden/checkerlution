@@ -16,8 +16,7 @@ func (scape *CheckerlutionScape) SetThinker(thinker *Checkerlution) {
 
 func (scape *CheckerlutionScape) Fitness(cortex *ng.Cortex) (fitness float64) {
 
-	logg.LogTo("MAIN", "fitness called w/ cortex: %p", cortex)
-	logg.LogTo("MAIN", "scape: %p", scape)
+	logg.LogTo("MAIN", "scape.Fitness() called, playing checkers game")
 
 	// play a game of checkers
 	scape.thinker.StartWithCortex(cortex, cbot.RED_TEAM)

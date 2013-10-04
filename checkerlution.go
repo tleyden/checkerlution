@@ -36,7 +36,7 @@ func (c *Checkerlution) StartWithCortex(cortex *ng.Cortex, ourTeamId int) {
 	cortex.Run()
 }
 
-func (c *Checkerlution) GameFinished(gameState cbot.GameState) (shouldQuit bool) {
+func (c Checkerlution) GameFinished(gameState cbot.GameState) (shouldQuit bool) {
 	switch c.mode {
 	case TRAINING_MODE:
 		shouldQuit = true
@@ -60,7 +60,7 @@ func (c *Checkerlution) Think(gameState cbot.GameState) (bestMove cbot.ValidMove
 	return
 }
 
-func (c *Checkerlution) Cortex() *ng.Cortex {
+func (c Checkerlution) Cortex() *ng.Cortex {
 	return c.cortex
 }
 
@@ -68,7 +68,7 @@ func (c *Checkerlution) SetMode(mode int) {
 	c.mode = mode
 }
 
-func (c *Checkerlution) calculateFitness(gameState cbot.GameState) (fitness float64) {
+func (c Checkerlution) calculateFitness(gameState cbot.GameState) (fitness float64) {
 	weWon := (gameState.WinningTeam == c.ourTeamId)
 	switch weWon {
 	case true:
@@ -134,7 +134,7 @@ func (c *Checkerlution) chooseBestMove(gameStateVector GameStateVector, possible
 
 	for _, move := range possibleMoves {
 
-		logg.LogTo("MAIN", "feed possible move to cortex: %p", move)
+		logg.LogTo("MAIN", "feed possible move to cortex: %v", move)
 
 		// present it to the neural net
 		c.currentPossibleMove = move
@@ -226,9 +226,6 @@ func (c *Checkerlution) CreateSensors() {
 
 	sensorFuncGameState := func(syncCounter int) []float64 {
 		logg.LogTo("MAIN", "sensor func game state called")
-		logg.LogTo("MAIN", "c.currentGameState: %v", c.currentGameState)
-		logg.LogTo("MAIN", "createSensors() checkerlution: %p", c)
-		logg.LogTo("MAIN", "createSensors() checkerlution corex: %p", c.cortex)
 		return c.currentGameState
 	}
 	sensorGameStateNodeId := ng.NewSensorId("SensorGameState", sensorLayer)
