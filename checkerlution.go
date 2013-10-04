@@ -6,12 +6,20 @@ import (
 	ng "github.com/tleyden/neurgo"
 )
 
+const (
+	RUNNING_MODE = iota
+	TRAINING_MODE
+)
+
 type Checkerlution struct {
 	ourTeamId            int
 	cortex               *ng.Cortex
 	currentGameState     GameStateVector
 	currentPossibleMove  ValidMoveCortexInput
 	latestActuatorOutput []float64
+	mode                 int
+	latestFitnessScore   float64
+	moveCounter          int
 }
 
 func (c *Checkerlution) Start(ourTeamId int) {
@@ -22,8 +30,25 @@ func (c *Checkerlution) Start(ourTeamId int) {
 
 }
 
-func (c *Checkerlution) Think(gameState cbot.GameState) (bestMove cbot.ValidMove) {
+func (c *Checkerlution) StartWithCortex(cortex *ng.Cortex, ourTeamId int) {
+	c.ourTeamId = ourTeamId
+	c.cortex = cortex
+	cortex.Run()
+}
 
+func (c Checkerlution) GameFinished(gameState cbot.GameState) (shouldQuit bool) {
+	switch c.mode {
+	case TRAINING_MODE:
+		shouldQuit = true
+		c.latestFitnessScore = c.calculateFitness(gameState)
+	case RUNNING_MODE:
+		shouldQuit = false
+	}
+	return
+}
+
+func (c *Checkerlution) Think(gameState cbot.GameState) (bestMove cbot.ValidMove) {
+	c.moveCounter += 1
 	gameStateVector := c.extractGameStateVector(gameState)
 	possibleMoves := c.extractPossibleMoves(gameState)
 	if len(possibleMoves) == 0 {
@@ -32,6 +57,30 @@ func (c *Checkerlution) Think(gameState cbot.GameState) (bestMove cbot.ValidMove
 	}
 	bestMoveCortex := c.chooseBestMove(gameStateVector, possibleMoves)
 	bestMove = bestMoveCortex.validMove
+	return
+}
+
+func (c Checkerlution) calculateFitness(gameState cbot.GameState) (fitness float64) {
+	weWon := (gameState.WinningTeam == c.ourTeamId)
+	switch weWon {
+	case true:
+		// fitness will be a positive number
+		// the least amount of moves we made, the higher the fitness
+		fitness = 100
+		fitness -= float64(c.moveCounter)
+		if fitness < 1 {
+			fitness = 1 // lowest possible fitness when winning
+		}
+	case false:
+		// fitness will be a negative number
+		// the least amount of moves we made, the lower (more negative)
+		// the fitness, because we didn't put up much of a fight
+		fitness = -100
+		fitness += float64(c.moveCounter)
+		if fitness > -1 {
+			fitness = -1 // highest possible fitness when losing
+		}
+	}
 	return
 }
 
