@@ -7,19 +7,28 @@ import (
 )
 
 type CheckerlutionScape struct {
+	thinker *Checkerlution
 }
 
-func (scape CheckerlutionScape) Fitness(cortex *ng.Cortex) (fitness float64) {
+func (scape *CheckerlutionScape) SetThinker(thinker *Checkerlution) {
+	scape.thinker = thinker
+}
+
+func (scape *CheckerlutionScape) Fitness(cortex *ng.Cortex) (fitness float64) {
+
+	logg.LogTo("MAIN", "fitness called w/ cortex: %p", cortex)
+	logg.LogTo("MAIN", "scape: %p", scape)
 
 	// play a game of checkers
-	thinker := &Checkerlution{mode: TRAINING_MODE}
-	thinker.StartWithCortex(cortex, cbot.RED_TEAM)
-	game := cbot.NewGame(cbot.RED_TEAM, thinker)
+	scape.thinker.StartWithCortex(cortex, cbot.RED_TEAM)
+	game := cbot.NewGame(cbot.RED_TEAM, scape.thinker)
 	game.GameLoop()
 
 	// get result
-	fitness = thinker.latestFitnessScore
+	fitness = scape.thinker.latestFitnessScore
 	logg.LogTo("MAIN", "checkerlution scape returning fitness: %v", fitness)
+
+	cortex.Shutdown()
 
 	return
 
