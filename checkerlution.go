@@ -36,23 +36,29 @@ func (c *Checkerlution) StartWithCortex(cortex *ng.Cortex, ourTeamId int) {
 	cortex.Run()
 }
 
-func (c Checkerlution) GameFinished(gameState cbot.GameState) (shouldQuit bool) {
+func (c *Checkerlution) GameFinished(gameState cbot.GameState) (shouldQuit bool) {
+	logg.LogTo("MAIN", "GameFinished")
 	switch c.mode {
 	case TRAINING_MODE:
+		logg.LogTo("MAIN", "in TRAINING_MODE, so quitting")
 		shouldQuit = true
 		c.latestFitnessScore = c.calculateFitness(gameState)
 	case RUNNING_MODE:
+		logg.LogTo("MAIN", "in RUNNIG_MODE, so not quitting")
 		shouldQuit = false
 	}
+	logg.LogTo("MAIN", "shouldQuit: %v", shouldQuit)
 	return
 }
 
-func (c *Checkerlution) Think(gameState cbot.GameState) (bestMove cbot.ValidMove) {
+func (c *Checkerlution) Think(gameState cbot.GameState) (bestMove cbot.ValidMove, ok bool) {
+	ok = true
 	c.moveCounter += 1
 	gameStateVector := c.extractGameStateVector(gameState)
 	possibleMoves := c.extractPossibleMoves(gameState)
 	if len(possibleMoves) == 0 {
 		logg.LogTo("MAIN", "No possibleMoves, ignoring changes")
+		ok = false
 		return
 	}
 	bestMoveCortex := c.chooseBestMove(gameStateVector, possibleMoves)
@@ -72,6 +78,7 @@ func (c Checkerlution) calculateFitness(gameState cbot.GameState) (fitness float
 	weWon := (gameState.WinningTeam == c.ourTeamId)
 	switch weWon {
 	case true:
+		logg.LogTo("MAIN", "calculateFitness based on winning")
 		// fitness will be a positive number
 		// the least amount of moves we made, the higher the fitness
 		fitness = 100
@@ -80,6 +87,7 @@ func (c Checkerlution) calculateFitness(gameState cbot.GameState) (fitness float
 			fitness = 1 // lowest possible fitness when winning
 		}
 	case false:
+		logg.LogTo("MAIN", "calculateFitness based on losing")
 		// fitness will be a negative number
 		// the least amount of moves we made, the lower (more negative)
 		// the fitness, because we didn't put up much of a fight
@@ -89,6 +97,8 @@ func (c Checkerlution) calculateFitness(gameState cbot.GameState) (fitness float
 			fitness = -1 // highest possible fitness when losing
 		}
 	}
+
+	logg.LogTo("MAIN", "calculateFitness returning: %v", fitness)
 	return
 }
 

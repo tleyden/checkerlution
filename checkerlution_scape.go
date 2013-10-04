@@ -22,6 +22,7 @@ func (scape *CheckerlutionScape) Fitness(cortex *ng.Cortex) (fitness float64) {
 	scape.thinker.StartWithCortex(cortex, cbot.RED_TEAM)
 	game := cbot.NewGame(cbot.RED_TEAM, scape.thinker)
 	game.GameLoop()
+	logg.LogTo("MAIN", "gameLoop finished, get fitness")
 
 	// get result
 	fitness = scape.thinker.latestFitnessScore
