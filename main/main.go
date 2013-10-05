@@ -5,6 +5,8 @@ import (
 	"github.com/tleyden/checkerlution"
 	ng "github.com/tleyden/neurgo"
 	nv "github.com/tleyden/neurvolve"
+	"net/http"
+	"net/url"
 )
 
 func init() {
@@ -13,7 +15,13 @@ func init() {
 	ng.SeedRandom()
 }
 
+var shouldUseProxy bool = false
+
 func main() {
+
+	if shouldUseProxy {
+		useProxy()
+	}
 
 	// create a checkerlution instance just to create a cortex (kludgy)
 	thinker := &checkerlution.Checkerlution{}
@@ -39,5 +47,14 @@ func main() {
 	}
 
 	cortexTrained.MarshalJSONToFile("/tmp/checkerlution.json")
+
+}
+
+func useProxy() {
+	proxyUrl, err := url.Parse("http://localhost:8888")
+	http.DefaultTransport = &http.Transport{Proxy: http.ProxyURL(proxyUrl)}
+	if err != nil {
+		panic("proxy issue")
+	}
 
 }
