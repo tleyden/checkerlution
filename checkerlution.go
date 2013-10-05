@@ -19,7 +19,6 @@ type Checkerlution struct {
 	latestActuatorOutput []float64
 	mode                 int
 	latestFitnessScore   float64
-	moveCounter          int
 }
 
 func (c *Checkerlution) Start(ourTeamId int) {
@@ -53,7 +52,6 @@ func (c *Checkerlution) GameFinished(gameState cbot.GameState) (shouldQuit bool)
 
 func (c *Checkerlution) Think(gameState cbot.GameState) (bestMove cbot.ValidMove, ok bool) {
 	ok = true
-	c.moveCounter += 1
 	gameStateVector := c.extractGameStateVector(gameState)
 	possibleMoves := c.extractPossibleMoves(gameState)
 	if len(possibleMoves) == 0 {
@@ -82,7 +80,7 @@ func (c Checkerlution) calculateFitness(gameState cbot.GameState) (fitness float
 		// fitness will be a positive number
 		// the least amount of moves we made, the higher the fitness
 		fitness = 100
-		fitness -= float64(c.moveCounter)
+		fitness -= float64(gameState.Turn)
 		if fitness < 1 {
 			fitness = 1 // lowest possible fitness when winning
 		}
@@ -92,7 +90,7 @@ func (c Checkerlution) calculateFitness(gameState cbot.GameState) (fitness float
 		// the least amount of moves we made, the lower (more negative)
 		// the fitness, because we didn't put up much of a fight
 		fitness = -100
-		fitness += float64(c.moveCounter)
+		fitness += float64(gameState.Turn)
 		if fitness > -1 {
 			fitness = -1 // highest possible fitness when losing
 		}
