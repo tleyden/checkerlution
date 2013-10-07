@@ -18,6 +18,8 @@ func (scape *CheckerlutionScape) Fitness(cortex *ng.Cortex) (fitness float64) {
 
 	logg.LogTo("MAIN", "scape.Fitness() called, playing checkers game")
 
+	cortex.Init()
+
 	// TODO: if this is the 2nd or later round, and Fitness is called
 	// even though the residue from the previous round is still hanging
 	// around .. it will think the game is finished and return a fitness.
