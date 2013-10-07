@@ -1,12 +1,14 @@
 package main
 
 import (
+	"fmt"
 	"github.com/couchbaselabs/logg"
 	"github.com/tleyden/checkerlution"
 	ng "github.com/tleyden/neurgo"
 	nv "github.com/tleyden/neurvolve"
 	"net/http"
 	"net/url"
+	"time"
 )
 
 func init() {
@@ -35,7 +37,7 @@ func main() {
 
 	// create a stochastic hill climber
 	shc := &nv.StochasticHillClimber{
-		FitnessThreshold:           50,
+		FitnessThreshold:           90,
 		MaxIterationsBeforeRestart: 5,
 		MaxAttempts:                1,
 	}
@@ -46,7 +48,9 @@ func main() {
 		logg.LogTo("MAIN", "Training Failed")
 	}
 
-	cortexTrained.MarshalJSONToFile("/tmp/checkerlution.json")
+	filename := fmt.Sprintf("/tmp/checkerlution-%v.json", time.Now().Unix())
+	logg.LogTo("MAIN", "Dumping latest cortex to %v", filename)
+	cortexTrained.MarshalJSONToFile(filename)
 
 }
 
