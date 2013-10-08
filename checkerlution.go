@@ -217,7 +217,6 @@ func (c *Checkerlution) CreateActuator() {
 	actuatorFunc := func(outputs []float64) {
 		logg.LogTo("MAIN", "actuator func called with: %v", outputs)
 		c.latestActuatorOutput = outputs
-		c.cortex.SyncChan <- actuatorNodeId // TODO: this should be in actuator itself, not in this function
 	}
 	actuator := &ng.Actuator{
 		NodeId:           actuatorNodeId,
