@@ -1,13 +1,10 @@
 [![Build Status](https://drone.io/github.com/tleyden/checkerlution/status.png)](https://drone.io/github.com/tleyden/checkerlution/latest)
 
-
-A "checkers bot" which connects to a [Checkers Overlord](https://github.com/apage43/checkers-overlord) server and uses [neurgo](https://github.com/tleyden/neurgo) to do it's thinking (or lack thereof).
-
-![screenshot](http://cl.ly/image/1w423h062S1d/Screen%20Shot%202013-09-25%20at%2012.46.27%20AM.png)
+A checkers bot implementation for [checkers-bot](https://github.com/tleyden/checkers-bot) which uses [neurgo](https://github.com/tleyden/neurgo) to do it's thinking (or lack thereof).
 
 # Architecture
 
-![architecture png](http://cl.ly/image/3v3N2G3X192h/architecture.png)
+![architecture png](http://cl.ly/image/3q243W3w3900/Screen%20Shot%202013-10-08%20at%2010.35.57%20PM.png)
 
 # Install pre-requisites
 
@@ -26,15 +23,17 @@ $ cd $GOPATH/src/github.com/tleyden/checkerlution
 $ go test -v
 ```
 
-# Install Couchbase Server
+# Install Pre-requisites
 
-# Install [Sync Gateway](https://github.com/couchbase/sync_gateway)
+* [Couchbase Server](http://www.couchbase.com/download)
 
-# Install [Checkers Overlord](https://github.com/apage43/checkers-overlord)
+* [Sync Gateway](https://github.com/couchbase/sync_gateway)
 
-# Install Checkers Lite
+* [Checkers Overlord](https://github.com/apage43/checkers-overlord)
 
-Not strictly required, but very useful in order to view the game.
+* [Checkers-iOS](https://github.com/couchbaselabs/Checkers-iOS)
+
+Checkers-iOS is not strictly required, but very useful in order to view the game.
 
 The other way to install [Checkers-iOS](https://github.com/couchbaselabs/Checkers-iOS) from github.  Unfortunately it is a private repo at the time of this writing.  Contact [wacarter](https://github.com/wacarter) if you are interested in getting the source code.
 
