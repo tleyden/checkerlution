@@ -79,7 +79,7 @@ func (c Checkerlution) calculateFitness(gameState cbot.GameState) (fitness float
 		logg.LogTo("MAIN", "calculateFitness based on winning")
 		// fitness will be a positive number
 		// the least amount of moves we made, the higher the fitness
-		fitness = 100
+		fitness = 200
 		fitness -= float64(gameState.Turn)
 		if fitness < 1 {
 			fitness = 1 // lowest possible fitness when winning
@@ -89,7 +89,7 @@ func (c Checkerlution) calculateFitness(gameState cbot.GameState) (fitness float
 		// fitness will be a negative number
 		// the least amount of moves we made, the lower (more negative)
 		// the fitness, because we didn't put up much of a fight
-		fitness = -100
+		fitness = -200
 		fitness += float64(gameState.Turn)
 		if fitness > -1 {
 			fitness = -1 // highest possible fitness when losing
@@ -204,7 +204,7 @@ func (c *Checkerlution) ConnectNodes() {
 
 func (c *Checkerlution) CreateNeuron() {
 	neuron := &ng.Neuron{
-		ActivationFunction: ng.EncodableSigmoid(),
+		ActivationFunction: ng.EncodableTanh(),
 		NodeId:             ng.NewNeuronId("Neuron", 0.25),
 		Bias:               ng.RandomBias(),
 	}
