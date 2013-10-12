@@ -6,6 +6,7 @@ import (
 	"github.com/tleyden/checkerlution"
 	ng "github.com/tleyden/neurgo"
 	nv "github.com/tleyden/neurvolve"
+	"math"
 	"net/http"
 	"net/url"
 	"time"
@@ -14,6 +15,10 @@ import (
 func init() {
 	logg.LogKeys["MAIN"] = true
 	logg.LogKeys["DEBUG"] = true
+	logg.LogKeys["NODE_PRE_SEND"] = true
+	logg.LogKeys["NODE_POST_SEND"] = true
+	logg.LogKeys["NODE_POST_RECV"] = true
+	logg.LogKeys["NODE_STATE"] = true
 	ng.SeedRandom()
 }
 
@@ -37,11 +42,12 @@ func main() {
 
 	// create a stochastic hill climber
 	shc := &nv.StochasticHillClimber{
-		FitnessThreshold:           90,
+		FitnessThreshold:           150,
 		MaxIterationsBeforeRestart: 5,
-		MaxAttempts:                1,
+		MaxAttempts:                5,
+		WeightSaturationRange:      []float64{-2 * math.Pi, 2 * math.Pi},
 	}
-	cortexTrained, succeeded := shc.TrainScape(cortex, scape)
+	cortexTrained, succeeded := shc.Train(cortex, scape)
 	if succeeded {
 		logg.LogTo("MAIN", "Training succeeded")
 	} else {
