@@ -4,7 +4,7 @@ A checkers bot implementation for [checkers-bot](https://github.com/tleyden/chec
 
 # Architecture
 
-![architecture png](http://cl.ly/image/3q243W3w3900/Screen%20Shot%202013-10-08%20at%2010.35.57%20PM.png)
+![architecture png](http://cl.ly/image/1V1D393S0A45/Screen%20Shot%202013-10-13%20at%2010.53.01%20AM.png)
 
 # Install pre-requisites
 
