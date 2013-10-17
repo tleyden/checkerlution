@@ -22,18 +22,13 @@ func init() {
 	ng.SeedRandom()
 }
 
-var shouldUseProxy bool = false
-
 func main() {
-
-	if shouldUseProxy {
-		useProxy()
-	}
 
 	// create a checkerlution instance just to create a cortex (kludgy)
 	thinker := &checkerlution.Checkerlution{}
 	thinker.SetMode(checkerlution.TRAINING_MODE)
 	thinker.CreateNeurgoCortex()
+	// thinker.LoadNeurgoCortex("/Users/traun/tmp/checkerlution-1381908895.json")
 	cortex := thinker.Cortex()
 
 	// setup the scape
@@ -57,14 +52,5 @@ func main() {
 	filename := fmt.Sprintf("/tmp/checkerlution-%v.json", time.Now().Unix())
 	logg.LogTo("MAIN", "Dumping latest cortex to %v", filename)
 	cortexTrained.MarshalJSONToFile(filename)
-
-}
-
-func useProxy() {
-	proxyUrl, err := url.Parse("http://localhost:8888")
-	http.DefaultTransport = &http.Transport{Proxy: http.ProxyURL(proxyUrl)}
-	if err != nil {
-		panic("proxy issue")
-	}
 
 }
