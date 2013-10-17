@@ -4,11 +4,10 @@ import (
 	"fmt"
 	"github.com/couchbaselabs/logg"
 	"github.com/tleyden/checkerlution"
+	cbot "github.com/tleyden/checkers-bot"
 	ng "github.com/tleyden/neurgo"
 	nv "github.com/tleyden/neurvolve"
 	"math"
-	"net/http"
-	"net/url"
 	"time"
 )
 
@@ -32,8 +31,11 @@ func main() {
 	cortex := thinker.Cortex()
 
 	// setup the scape
+	team, syncGatewayUrl, _ := cbot.ParseCmdLine()
 	scape := &checkerlution.CheckerlutionScape{}
 	scape.SetThinker(thinker)
+	scape.SetSyncGatewayUrl(syncGatewayUrl)
+	scape.SetTeam(team)
 
 	// create a stochastic hill climber
 	shc := &nv.StochasticHillClimber{

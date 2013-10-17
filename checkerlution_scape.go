@@ -9,11 +9,21 @@ import (
 )
 
 type CheckerlutionScape struct {
-	thinker *Checkerlution
+	thinker        *Checkerlution
+	team           int
+	syncGatewayUrl string
 }
 
 func (scape *CheckerlutionScape) SetThinker(thinker *Checkerlution) {
 	scape.thinker = thinker
+}
+
+func (scape *CheckerlutionScape) SetSyncGatewayUrl(syncGatewayUrl string) {
+	scape.syncGatewayUrl = syncGatewayUrl
+}
+
+func (scape *CheckerlutionScape) SetTeam(team int) {
+	scape.team = team
 }
 
 func (scape *CheckerlutionScape) Fitness(cortex *ng.Cortex) (fitness float64) {
@@ -27,8 +37,9 @@ func (scape *CheckerlutionScape) Fitness(cortex *ng.Cortex) (fitness float64) {
 		cortex.Init()
 
 		// play a game of checkers
-		scape.thinker.StartWithCortex(cortex, cbot.RED_TEAM)
-		game := cbot.NewGame(cbot.RED_TEAM, scape.thinker)
+		scape.thinker.StartWithCortex(cortex, scape.team)
+		game := cbot.NewGame(scape.team, scape.thinker)
+		game.SetServerUrl(scape.syncGatewayUrl)
 		game.GameLoop()
 		logg.LogTo("MAIN", "gameLoop finished")
 
