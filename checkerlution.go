@@ -1,9 +1,11 @@
 package checkerlution
 
 import (
+	"encoding/json"
 	"github.com/couchbaselabs/logg"
 	cbot "github.com/tleyden/checkers-bot"
 	ng "github.com/tleyden/neurgo"
+	"os"
 )
 
 const (
@@ -175,6 +177,24 @@ func (c *Checkerlution) CreateNeurgoCortex() {
 	c.CreateActuator()
 	c.CreateNeuron()
 	c.ConnectNodes()
+}
+
+func (c *Checkerlution) LoadNeurgoCortex(filename string) {
+
+	// TODO: move this code to cortex!!
+
+	file, err := os.Open(filename)
+	if err != nil {
+		logg.LogPanic("Error opening file: %v", err)
+	}
+
+	cortex := &ng.Cortex{}
+	jsonParser := json.NewDecoder(file)
+	if err = jsonParser.Decode(cortex); err != nil {
+		logg.LogPanic("Error parsing file: %v", err)
+	}
+	c.cortex = cortex
+
 }
 
 func (c *Checkerlution) ConnectNodes() {
