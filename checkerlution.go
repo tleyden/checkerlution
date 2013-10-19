@@ -39,6 +39,20 @@ func (c *Checkerlution) StartWithCortex(cortex *ng.Cortex, ourTeamId cbot.TeamTy
 	cortex.Run()
 }
 
+func (c *Checkerlution) Think(gameState cbot.GameState) (bestMove cbot.ValidMove, ok bool) {
+	ok = true
+	gameStateVector := c.extractGameStateVector(gameState)
+	possibleMoves := c.extractPossibleMoves(gameState)
+	if len(possibleMoves) == 0 {
+		logg.LogTo("MAIN", "No possibleMoves, ignoring changes")
+		ok = false
+		return
+	}
+	bestMoveCortex := c.chooseBestMove(gameStateVector, possibleMoves)
+	bestMove = bestMoveCortex.validMove
+	return
+}
+
 func (c *Checkerlution) GameFinished(gameState cbot.GameState) (shouldQuit bool) {
 	logg.LogTo("MAIN", "GameFinished")
 	switch c.mode {
@@ -51,20 +65,6 @@ func (c *Checkerlution) GameFinished(gameState cbot.GameState) (shouldQuit bool)
 		shouldQuit = false
 	}
 	logg.LogTo("MAIN", "shouldQuit: %v", shouldQuit)
-	return
-}
-
-func (c *Checkerlution) Think(gameState cbot.GameState) (bestMove cbot.ValidMove, ok bool) {
-	ok = true
-	gameStateVector := c.extractGameStateVector(gameState)
-	possibleMoves := c.extractPossibleMoves(gameState)
-	if len(possibleMoves) == 0 {
-		logg.LogTo("MAIN", "No possibleMoves, ignoring changes")
-		ok = false
-		return
-	}
-	bestMoveCortex := c.chooseBestMove(gameStateVector, possibleMoves)
-	bestMove = bestMoveCortex.validMove
 	return
 }
 
@@ -236,46 +236,55 @@ func (c *Checkerlution) CreateNeuron() {
 func (c *Checkerlution) CreateActuator() {
 
 	actuatorNodeId := ng.NewActuatorId("Actuator", 0.5)
-	actuatorFunc := func(outputs []float64) {
-		logg.LogTo("MAIN", "actuator func called with: %v", outputs)
-		c.latestActuatorOutput = outputs
-	}
 	actuator := &ng.Actuator{
 		NodeId:           actuatorNodeId,
 		VectorLength:     1,
-		ActuatorFunction: actuatorFunc,
+		ActuatorFunction: c.actuatorFunc(),
 	}
 	c.cortex.SetActuators([]*ng.Actuator{actuator})
 
+}
+
+func (c *Checkerlution) actuatorFunc() ng.ActuatorFunction {
+	return func(outputs []float64) {
+		logg.LogTo("MAIN", "actuator func called with: %v", outputs)
+		c.latestActuatorOutput = outputs
+	}
 }
 
 func (c *Checkerlution) CreateSensors() {
 
 	sensorLayer := 0.0
 
-	sensorFuncGameState := func(syncCounter int) []float64 {
-		logg.LogTo("MAIN", "sensor func game state called")
-		return c.currentGameState
-	}
 	sensorGameStateNodeId := ng.NewSensorId("SensorGameState", sensorLayer)
 	sensorGameState := &ng.Sensor{
 		NodeId:         sensorGameStateNodeId,
 		VectorLength:   32,
-		SensorFunction: sensorFuncGameState,
+		SensorFunction: c.sensorFuncGameState(),
 	}
 
-	sensorFuncPossibleMove := func(syncCounter int) []float64 {
-		logg.LogTo("MAIN", "sensor func possible move called")
-		return c.currentPossibleMove.VectorRepresentation()
-	}
 	sensorPossibleMoveNodeId := ng.NewSensorId("SensorPossibleMove", sensorLayer)
 	sensorPossibleMove := &ng.Sensor{
 		NodeId:         sensorPossibleMoveNodeId,
 		VectorLength:   5, // start_location, is_king, final_location, will_be_king, amt_would_capture
-		SensorFunction: sensorFuncPossibleMove,
+		SensorFunction: c.sensorFuncPossibleMove(),
 	}
 	c.cortex.SetSensors([]*ng.Sensor{sensorGameState, sensorPossibleMove})
 
+}
+
+func (c *Checkerlution) sensorFuncGameState() ng.SensorFunction {
+	return func(syncCounter int) []float64 {
+		logg.LogTo("MAIN", "sensor func game state called")
+		return c.currentGameState
+	}
+}
+
+func (c *Checkerlution) sensorFuncPossibleMove() ng.SensorFunction {
+	return func(syncCounter int) []float64 {
+		logg.LogTo("MAIN", "sensor func possible move called")
+		return c.currentPossibleMove.VectorRepresentation()
+	}
 }
 
 func (c Checkerlution) Stop() {
