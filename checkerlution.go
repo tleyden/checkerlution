@@ -1,11 +1,9 @@
 package checkerlution
 
 import (
-	"encoding/json"
 	"github.com/couchbaselabs/logg"
 	cbot "github.com/tleyden/checkers-bot"
 	ng "github.com/tleyden/neurgo"
-	"os"
 )
 
 type OperationMode int
@@ -183,19 +181,10 @@ func (c *Checkerlution) CreateNeurgoCortex() {
 
 func (c *Checkerlution) LoadNeurgoCortex(filename string) {
 
-	// TODO: move this code to cortex!!
-
-	file, err := os.Open(filename)
+	cortex, err := ng.NewCortexFromJSONFile(filename)
 	if err != nil {
-		logg.LogPanic("Error opening file: %v", err)
+		logg.LogPanic("Error reading cortex from: %v.  Err: %v", filename, err)
 	}
-
-	cortex := &ng.Cortex{}
-	jsonParser := json.NewDecoder(file)
-	if err = jsonParser.Decode(cortex); err != nil {
-		logg.LogPanic("Error parsing file: %v", err)
-	}
-	cortex.LinkNodesToCortex()
 
 	c.setSensorActuatorFunctions(cortex)
 
