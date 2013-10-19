@@ -8,6 +8,8 @@ import (
 	"os"
 )
 
+type OperationMode int
+
 const (
 	RUNNING_MODE = iota
 	TRAINING_MODE
@@ -19,7 +21,7 @@ type Checkerlution struct {
 	currentGameState     GameStateVector
 	currentPossibleMove  ValidMoveCortexInput
 	latestActuatorOutput []float64
-	mode                 int
+	mode                 OperationMode
 	latestFitnessScore   float64
 }
 
@@ -70,7 +72,7 @@ func (c Checkerlution) Cortex() *ng.Cortex {
 	return c.cortex
 }
 
-func (c *Checkerlution) SetMode(mode int) {
+func (c *Checkerlution) SetMode(mode OperationMode) {
 	c.mode = mode
 }
 
