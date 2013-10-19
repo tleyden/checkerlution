@@ -14,7 +14,7 @@ const (
 )
 
 type Checkerlution struct {
-	ourTeamId            int
+	ourTeamId            cbot.TeamType
 	cortex               *ng.Cortex
 	currentGameState     GameStateVector
 	currentPossibleMove  ValidMoveCortexInput
@@ -23,7 +23,7 @@ type Checkerlution struct {
 	latestFitnessScore   float64
 }
 
-func (c *Checkerlution) Start(ourTeamId int) {
+func (c *Checkerlution) Start(ourTeamId cbot.TeamType) {
 	c.ourTeamId = ourTeamId
 	c.CreateNeurgoCortex()
 	cortex := c.cortex
@@ -31,7 +31,7 @@ func (c *Checkerlution) Start(ourTeamId int) {
 
 }
 
-func (c *Checkerlution) StartWithCortex(cortex *ng.Cortex, ourTeamId int) {
+func (c *Checkerlution) StartWithCortex(cortex *ng.Cortex, ourTeamId cbot.TeamType) {
 	c.ourTeamId = ourTeamId
 	c.cortex = cortex
 	cortex.Run()

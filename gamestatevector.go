@@ -29,11 +29,11 @@ func NewGameStateVector() GameStateVector {
 
 }
 
-func (v *GameStateVector) loadFromGameState(gameState cbot.GameState, ourTeamId int) {
+func (v *GameStateVector) loadFromGameState(gameState cbot.GameState, ourTeamId cbot.TeamType) {
 
 	v2 := *v
 	for teamID, team := range gameState.Teams {
-		isOurTeam := (teamID == ourTeamId)
+		isOurTeam := (teamID == int(ourTeamId))
 		for _, piece := range team.Pieces {
 			vectorIndex := piece.Location - 1
 

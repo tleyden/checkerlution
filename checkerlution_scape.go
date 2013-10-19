@@ -10,7 +10,7 @@ import (
 
 type CheckerlutionScape struct {
 	thinker        *Checkerlution
-	team           int
+	team           cbot.TeamType
 	syncGatewayUrl string
 	feedType       cbot.FeedType
 }
@@ -73,7 +73,7 @@ func (scape *CheckerlutionScape) SetSyncGatewayUrl(syncGatewayUrl string) {
 	scape.syncGatewayUrl = syncGatewayUrl
 }
 
-func (scape *CheckerlutionScape) SetTeam(team int) {
+func (scape *CheckerlutionScape) SetTeam(team cbot.TeamType) {
 	scape.team = team
 }
 
