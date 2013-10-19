@@ -12,18 +12,7 @@ type CheckerlutionScape struct {
 	thinker        *Checkerlution
 	team           int
 	syncGatewayUrl string
-}
-
-func (scape *CheckerlutionScape) SetThinker(thinker *Checkerlution) {
-	scape.thinker = thinker
-}
-
-func (scape *CheckerlutionScape) SetSyncGatewayUrl(syncGatewayUrl string) {
-	scape.syncGatewayUrl = syncGatewayUrl
-}
-
-func (scape *CheckerlutionScape) SetTeam(team int) {
-	scape.team = team
+	feedType       cbot.FeedType
 }
 
 func (scape *CheckerlutionScape) Fitness(cortex *ng.Cortex) (fitness float64) {
@@ -40,6 +29,7 @@ func (scape *CheckerlutionScape) Fitness(cortex *ng.Cortex) (fitness float64) {
 		scape.thinker.StartWithCortex(cortex, scape.team)
 		game := cbot.NewGame(scape.team, scape.thinker)
 		game.SetServerUrl(scape.syncGatewayUrl)
+		game.SetFeedType(scape.feedType)
 		game.GameLoop()
 		logg.LogTo("MAIN", "gameLoop finished")
 
@@ -73,4 +63,20 @@ func (scape *CheckerlutionScape) Fitness(cortex *ng.Cortex) (fitness float64) {
 
 	return
 
+}
+
+func (scape *CheckerlutionScape) SetThinker(thinker *Checkerlution) {
+	scape.thinker = thinker
+}
+
+func (scape *CheckerlutionScape) SetSyncGatewayUrl(syncGatewayUrl string) {
+	scape.syncGatewayUrl = syncGatewayUrl
+}
+
+func (scape *CheckerlutionScape) SetTeam(team int) {
+	scape.team = team
+}
+
+func (scape *CheckerlutionScape) SetFeedType(feedType cbot.FeedType) {
+	scape.feedType = feedType
 }

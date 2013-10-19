@@ -31,10 +31,11 @@ func main() {
 	cortex := thinker.Cortex()
 
 	// setup the scape
-	team, syncGatewayUrl, _ := cbot.ParseCmdLine()
+	team, syncGatewayUrl, feedType := cbot.ParseCmdLine()
 	scape := &checkerlution.CheckerlutionScape{}
 	scape.SetThinker(thinker)
 	scape.SetSyncGatewayUrl(syncGatewayUrl)
+	scape.SetFeedType(feedType)
 	scape.SetTeam(team)
 
 	// create a stochastic hill climber
