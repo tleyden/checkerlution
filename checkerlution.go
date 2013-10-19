@@ -195,7 +195,22 @@ func (c *Checkerlution) LoadNeurgoCortex(filename string) {
 	if err = jsonParser.Decode(cortex); err != nil {
 		logg.LogPanic("Error parsing file: %v", err)
 	}
+	cortex.LinkNodesToCortex()
+
+	c.setSensorActuatorFunctions(cortex)
+
 	c.cortex = cortex
+}
+
+func (c *Checkerlution) setSensorActuatorFunctions(cortex *ng.Cortex) {
+
+	sensor := cortex.FindSensor(ng.NewSensorId("SensorGameState", 0))
+	sensor.SensorFunction = c.sensorFuncGameState()
+	sensor = cortex.FindSensor(ng.NewSensorId("SensorPossibleMove", 0))
+	sensor.SensorFunction = c.sensorFuncPossibleMove()
+
+	actuator := cortex.FindActuator(ng.NewActuatorId("Actuator", 0))
+	actuator.ActuatorFunction = c.actuatorFunc()
 
 }
 
