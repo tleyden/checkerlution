@@ -9,10 +9,11 @@ import (
 )
 
 type CheckerlutionScape struct {
-	thinker        *Checkerlution
-	team           cbot.TeamType
-	syncGatewayUrl string
-	feedType       cbot.FeedType
+	thinker               *Checkerlution
+	team                  cbot.TeamType
+	syncGatewayUrl        string
+	feedType              cbot.FeedType
+	randomDelayBeforeMove int
 }
 
 func (scape *CheckerlutionScape) Fitness(cortex *ng.Cortex) (fitness float64) {
@@ -30,6 +31,7 @@ func (scape *CheckerlutionScape) Fitness(cortex *ng.Cortex) (fitness float64) {
 		game := cbot.NewGame(scape.team, scape.thinker)
 		game.SetServerUrl(scape.syncGatewayUrl)
 		game.SetFeedType(scape.feedType)
+		game.SetDelayBeforeMove(scape.randomDelayBeforeMove)
 		game.GameLoop()
 		logg.LogTo("DEBUG", "gameLoop finished")
 
@@ -79,4 +81,8 @@ func (scape *CheckerlutionScape) SetTeam(team cbot.TeamType) {
 
 func (scape *CheckerlutionScape) SetFeedType(feedType cbot.FeedType) {
 	scape.feedType = feedType
+}
+
+func (scape *CheckerlutionScape) SetRandomDelayBeforeMove(delay int) {
+	scape.randomDelayBeforeMove = delay
 }

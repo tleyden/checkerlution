@@ -28,7 +28,7 @@ func main() {
 	thinker := &checkerlution.Checkerlution{}
 	thinker.SetMode(checkerlution.TRAINING_MODE)
 	// thinker.CreateNeurgoCortex()
-	thinker.LoadNeurgoCortex("/Users/traun/tmp/checkerlution-1381908895.json")
+	thinker.LoadNeurgoCortex("/tmp/checkerlution-1382822166.json")
 	cortex := thinker.Cortex()
 
 	// setup the scape
@@ -38,6 +38,7 @@ func main() {
 	scape.SetSyncGatewayUrl(checkersBotFlags.SyncGatewayUrl)
 	scape.SetFeedType(checkersBotFlags.FeedType)
 	scape.SetTeam(checkersBotFlags.Team)
+	scape.SetRandomDelayBeforeMove(checkersBotFlags.RandomDelayBeforeMove)
 
 	// create a stochastic hill climber
 	shc := &nv.StochasticHillClimber{
