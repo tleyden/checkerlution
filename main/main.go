@@ -27,8 +27,8 @@ func main() {
 	// create a checkerlution instance just to create a cortex (kludgy)
 	thinker := &checkerlution.Checkerlution{}
 	thinker.SetMode(checkerlution.TRAINING_MODE)
-	// thinker.CreateNeurgoCortex()
-	thinker.LoadNeurgoCortex("/tmp/checkerlution-1382822166.json")
+	thinker.CreateNeurgoCortex()
+	// thinker.LoadNeurgoCortex("/tmp/checkerlution-1382822166.json")
 	cortex := thinker.Cortex()
 
 	// setup the scape
