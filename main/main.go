@@ -13,11 +13,12 @@ import (
 
 func init() {
 	logg.LogKeys["MAIN"] = true
-	logg.LogKeys["DEBUG"] = true
-	logg.LogKeys["NODE_PRE_SEND"] = true
-	logg.LogKeys["NODE_POST_SEND"] = true
-	logg.LogKeys["NODE_POST_RECV"] = true
-	logg.LogKeys["NODE_STATE"] = true
+	logg.LogKeys["DEBUG"] = false
+	logg.LogKeys["NEURGO"] = false
+	logg.LogKeys["NODE_PRE_SEND"] = false
+	logg.LogKeys["NODE_POST_SEND"] = false
+	logg.LogKeys["NODE_POST_RECV"] = false
+	logg.LogKeys["NODE_STATE"] = false
 	ng.SeedRandom()
 }
 
@@ -26,17 +27,17 @@ func main() {
 	// create a checkerlution instance just to create a cortex (kludgy)
 	thinker := &checkerlution.Checkerlution{}
 	thinker.SetMode(checkerlution.TRAINING_MODE)
-	thinker.CreateNeurgoCortex()
-	// thinker.LoadNeurgoCortex("/Users/traun/tmp/checkerlution-1381908895.json")
+	// thinker.CreateNeurgoCortex()
+	thinker.LoadNeurgoCortex("/Users/traun/tmp/checkerlution-1381908895.json")
 	cortex := thinker.Cortex()
 
 	// setup the scape
-	team, syncGatewayUrl, feedType := cbot.ParseCmdLine()
+	checkersBotFlags := cbot.ParseCmdLine()
 	scape := &checkerlution.CheckerlutionScape{}
 	scape.SetThinker(thinker)
-	scape.SetSyncGatewayUrl(syncGatewayUrl)
-	scape.SetFeedType(feedType)
-	scape.SetTeam(team)
+	scape.SetSyncGatewayUrl(checkersBotFlags.SyncGatewayUrl)
+	scape.SetFeedType(checkersBotFlags.FeedType)
+	scape.SetTeam(checkersBotFlags.Team)
 
 	// create a stochastic hill climber
 	shc := &nv.StochasticHillClimber{
@@ -53,7 +54,7 @@ func main() {
 	}
 
 	filename := fmt.Sprintf("/tmp/checkerlution-%v.json", time.Now().Unix())
-	logg.LogTo("MAIN", "Dumping latest cortex to %v", filename)
+	logg.LogTo("MAIN", "Saving Cortex to %v", filename)
 	cortexTrained.MarshalJSONToFile(filename)
 
 }
