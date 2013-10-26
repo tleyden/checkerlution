@@ -17,7 +17,7 @@ type CheckerlutionScape struct {
 
 func (scape *CheckerlutionScape) Fitness(cortex *ng.Cortex) (fitness float64) {
 
-	logg.LogTo("MAIN", "scape.Fitness() called, playing checkers game")
+	logg.LogTo("DEBUG", "scape.Fitness() called, playing checkers game")
 
 	fitnessVals := []float64{}
 
@@ -31,34 +31,34 @@ func (scape *CheckerlutionScape) Fitness(cortex *ng.Cortex) (fitness float64) {
 		game.SetServerUrl(scape.syncGatewayUrl)
 		game.SetFeedType(scape.feedType)
 		game.GameLoop()
-		logg.LogTo("MAIN", "gameLoop finished")
+		logg.LogTo("DEBUG", "gameLoop finished")
 
 		// get result (TODO: this feels clunky, just call thinker.calcFitness() here)
 		latestFitness := scape.thinker.latestFitnessScore
-		logg.LogTo("MAIN", "checkerlution scape fitness: %v", latestFitness)
+		logg.LogTo("MAIN", "Fitness: %v", latestFitness)
 		fitnessVals = append(fitnessVals, latestFitness)
 
 		// wait until the game number increments, otherwise on the
 		// next callback to this method, we'll jump into a game which
 		// is already over.
-		logg.LogTo("MAIN", "checkerlution WaitForNextGame()")
+		logg.LogTo("MAIN", "Wait For Next Game ..")
 		game.WaitForNextGame()
 
 		cortex.Shutdown()
 
 	}
 
-	logg.LogTo("MAIN", "completed game set, calc average fitness")
+	logg.LogTo("DEBUG", "Game Set Finished")
 
 	total := 0.0
 	for _, fitnessVal := range fitnessVals {
 		total += fitnessVal
 	}
 	fitness = total / float64(len(fitnessVals))
-	logg.LogTo("MAIN", "checkerlution avg fitness game set: %v", fitness)
+	logg.LogTo("MAIN", "Average Fitness for Game Set: %v", fitness)
 
 	filename := fmt.Sprintf("/tmp/checkerlution-%v.json", time.Now().Unix())
-	logg.LogTo("MAIN", "Dumping cortex to %v", filename)
+	logg.LogTo("MAIN", "Saving Cortex snapshot to %v", filename)
 	cortex.MarshalJSONToFile(filename)
 
 	return
