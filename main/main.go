@@ -28,7 +28,7 @@ func main() {
 	thinker := &checkerlution.Checkerlution{}
 	thinker.SetMode(checkerlution.TRAINING_MODE)
 	thinker.CreateNeurgoCortex()
-	// thinker.LoadNeurgoCortex("/tmp/checkerlution-1382822166.json")
+	// thinker.LoadNeurgoCortex("/tmp/checkerlution-good.json")
 	cortex := thinker.Cortex()
 
 	// setup the scape
@@ -47,7 +47,12 @@ func main() {
 		MaxAttempts:                5,
 		WeightSaturationRange:      []float64{-2 * math.Pi, 2 * math.Pi},
 	}
-	cortexTrained, succeeded := shc.Train(cortex, scape)
+	tmt := &nv.TopologyMutatingTrainer{
+		MaxAttempts:                100,
+		MaxIterationsBeforeRestart: 5,
+		StochasticHillClimber:      shc,
+	}
+	cortexTrained, succeeded := tmt.Train(cortex, scape)
 	if succeeded {
 		logg.LogTo("MAIN", "Training succeeded")
 	} else {
