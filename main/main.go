@@ -43,8 +43,8 @@ func main() {
 	// create a stochastic hill climber
 	shc := &nv.StochasticHillClimber{
 		FitnessThreshold:           150,
-		MaxIterationsBeforeRestart: 5,
-		MaxAttempts:                5,
+		MaxIterationsBeforeRestart: 10,
+		MaxAttempts:                500,
 		WeightSaturationRange:      []float64{-2 * math.Pi, 2 * math.Pi},
 	}
 	tmt := &nv.TopologyMutatingTrainer{
