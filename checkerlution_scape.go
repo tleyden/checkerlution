@@ -22,7 +22,7 @@ func (scape *CheckerlutionScape) Fitness(cortex *ng.Cortex) (fitness float64) {
 
 	fitnessVals := []float64{}
 
-	for i := 0; i < 5; i++ {
+	for i := 0; i < 7; i++ {
 
 		cortex.Init()
 
