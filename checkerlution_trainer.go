@@ -3,7 +3,6 @@ package checkerlution
 import (
 	"fmt"
 	"github.com/couchbaselabs/logg"
-	"github.com/tleyden/checkerlution"
 	cbot "github.com/tleyden/checkers-bot"
 	ng "github.com/tleyden/neurgo"
 	nv "github.com/tleyden/neurvolve"
@@ -15,7 +14,7 @@ func runPopulationTrainer() {
 
 	// setup the scape
 	checkersBotFlags := cbot.ParseCmdLine()
-	scape := &checkerlution.CheckerlutionScape{}
+	scape := &CheckerlutionScapeTwoPlayer{}
 	scape.SetSyncGatewayUrl(checkersBotFlags.SyncGatewayUrl)
 	scape.SetFeedType(checkersBotFlags.FeedType)
 	scape.SetTeam(checkersBotFlags.Team)
