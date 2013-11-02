@@ -273,7 +273,10 @@ func (c *Checkerlution) CreateSensors() {
 
 func (c *Checkerlution) sensorFuncGameState() ng.SensorFunction {
 	return func(syncCounter int) []float64 {
-		logg.LogTo("DEBUG", "sensor func game state called")
+		logg.LogTo("DEBUG", "sensor func game state called on thinker: %p, returning: %v", c, c.currentGameState)
+		if len(c.currentGameState) == 0 {
+			logg.LogPanic("sensor would return invalid gamestate")
+		}
 		return c.currentGameState
 	}
 }
