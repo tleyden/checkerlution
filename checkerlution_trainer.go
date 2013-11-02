@@ -60,8 +60,8 @@ func RunTopologyMutatingTrainer() {
 	// create a checkerlution instance just to create a cortex (kludgy)
 	thinker := &Checkerlution{}
 	thinker.SetMode(TRAINING_MODE)
-	// thinker.CreateNeurgoCortex()
-	thinker.LoadNeurgoCortex("cortex_avg8.json")
+	thinker.CreateNeurgoCortex()
+	// thinker.LoadNeurgoCortex("cortex_avg8.json")
 	cortex := thinker.Cortex()
 
 	// setup the scape
