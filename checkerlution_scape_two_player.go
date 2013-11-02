@@ -16,6 +16,9 @@ type CheckerlutionScapeTwoPlayer struct {
 func (scape *CheckerlutionScapeTwoPlayer) Fitness(cortex *ng.Cortex, opponentCortex *ng.Cortex) (fitness float64) {
 
 	logg.LogTo("DEBUG", "CheckerlutionScapeTwoPlayer fitness called")
+	if cortex == opponentCortex {
+		logg.LogPanic("Cannot calculate fitnesss between cortex %p and itself %p", cortex, opponentCortex)
+	}
 
 	cortex.Init()
 	opponentCortex.Init()
