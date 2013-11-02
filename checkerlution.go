@@ -33,6 +33,7 @@ func (c *Checkerlution) Start(ourTeamId cbot.TeamType) {
 
 func (c *Checkerlution) StartWithCortex(cortex *ng.Cortex, ourTeamId cbot.TeamType) {
 	c.ourTeamId = ourTeamId
+	c.setSensorActuatorFunctions(cortex)
 	c.cortex = cortex
 	cortex.Run()
 }
