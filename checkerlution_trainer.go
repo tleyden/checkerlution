@@ -20,7 +20,7 @@ func runPopulationTrainer() {
 	scape.SetTeam(checkersBotFlags.Team)
 	scape.SetRandomDelayBeforeMove(checkersBotFlags.RandomDelayBeforeMove)
 
-	noOpCortexMutator := func(cortex *ng.Cortex) (success bool, result MutateResult) {
+	noOpCortexMutator := func(cortex *ng.Cortex) (success bool, result nv.MutateResult) {
 		success = true
 		result = "nothing"
 		return
@@ -58,15 +58,15 @@ func runPopulationTrainer() {
 func runTopologyMutatingTrainer() {
 
 	// create a checkerlution instance just to create a cortex (kludgy)
-	thinker := &checkerlution.Checkerlution{}
-	thinker.SetMode(checkerlution.TRAINING_MODE)
+	thinker := &Checkerlution{}
+	thinker.SetMode(TRAINING_MODE)
 	// thinker.CreateNeurgoCortex()
 	thinker.LoadNeurgoCortex("cortex_avg8.json")
 	cortex := thinker.Cortex()
 
 	// setup the scape
 	checkersBotFlags := cbot.ParseCmdLine()
-	scape := &checkerlution.CheckerlutionScape{}
+	scape := &CheckerlutionScape{}
 	scape.SetThinker(thinker)
 	scape.SetSyncGatewayUrl(checkersBotFlags.SyncGatewayUrl)
 	scape.SetFeedType(checkersBotFlags.FeedType)
@@ -101,10 +101,10 @@ func runTopologyMutatingTrainer() {
 }
 
 func getInitialPopulation() (population []*ng.Cortex) {
-	population := make([]*ng.Cortex, 0)
+	population = make([]*ng.Cortex, 0)
 	for i := 0; i < 30; i++ {
 
-		thinker := &checkerlution.Checkerlution{}
+		thinker := &Checkerlution{}
 
 		// probably a bug, because the cortex is now "bound" to this
 		// thinker .. but we're discarding the thinker

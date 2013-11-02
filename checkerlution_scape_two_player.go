@@ -1,11 +1,9 @@
 package checkerlution
 
 import (
-	"fmt"
 	"github.com/couchbaselabs/logg"
 	cbot "github.com/tleyden/checkers-bot"
 	ng "github.com/tleyden/neurgo"
-	"time"
 )
 
 type CheckerlutionScapeTwoPlayer struct {
@@ -32,7 +30,8 @@ func (scape *CheckerlutionScapeTwoPlayer) Fitness(cortex *ng.Cortex, opponentCor
 	// setup checkers game for opponent
 	thinkerOpponent := &Checkerlution{}
 	thinkerOpponent.SetMode(TRAINING_MODE)
-	opponentTeam := cbot.RED_TEAM
+	var opponentTeam cbot.TeamType // TODO: why can't just use := syntax here?
+	opponentTeam = cbot.RED_TEAM
 	if scape.team == cbot.RED_TEAM {
 		opponentTeam = cbot.BLUE_TEAM
 	}
@@ -72,10 +71,10 @@ func (scape *CheckerlutionScapeTwoPlayer) runGameLoops(games []*cbot.Game) {
 		game.GameLoop()
 		result <- true
 	}
-	for i, game := range games {
+	for _, game := range games {
 		go runGameLoop(game, resultChannel)
 	}
-	for i, game := range games {
+	for _, _ = range games {
 		<-resultChannel
 	}
 
