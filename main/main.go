@@ -10,6 +10,8 @@ func init() {
 	logg.LogKeys["MAIN"] = true
 	logg.LogKeys["DEBUG"] = true
 	logg.LogKeys["NEURGO"] = true
+	logg.LogKeys["SENSOR_SYNC"] = true
+	logg.LogKeys["ACTUATOR_SYNC"] = true
 	logg.LogKeys["NODE_PRE_SEND"] = true
 	logg.LogKeys["NODE_POST_SEND"] = true
 	logg.LogKeys["NODE_POST_RECV"] = true
