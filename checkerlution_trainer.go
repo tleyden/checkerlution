@@ -10,7 +10,7 @@ import (
 	"time"
 )
 
-func runPopulationTrainer() {
+func RunPopulationTrainer() {
 
 	// setup the scape
 	checkersBotFlags := cbot.ParseCmdLine()
@@ -55,7 +55,7 @@ func runPopulationTrainer() {
 
 }
 
-func runTopologyMutatingTrainer() {
+func RunTopologyMutatingTrainer() {
 
 	// create a checkerlution instance just to create a cortex (kludgy)
 	thinker := &Checkerlution{}

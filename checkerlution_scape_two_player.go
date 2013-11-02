@@ -15,6 +15,8 @@ type CheckerlutionScapeTwoPlayer struct {
 
 func (scape *CheckerlutionScapeTwoPlayer) Fitness(cortex *ng.Cortex, opponentCortex *ng.Cortex) (fitness float64) {
 
+	logg.LogTo("DEBUG", "CheckerlutionScapeTwoPlayer fitness called")
+
 	cortex.Init()
 	opponentCortex.Init()
 
@@ -42,6 +44,7 @@ func (scape *CheckerlutionScapeTwoPlayer) Fitness(cortex *ng.Cortex, opponentCor
 	gameOpponent.SetDelayBeforeMove(scape.randomDelayBeforeMove)
 
 	// run both game loops and wait for both to finish
+	logg.LogTo("DEBUG", "Started games")
 	games := []*cbot.Game{game, gameOpponent}
 	scape.runGameLoops(games)
 

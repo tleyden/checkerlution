@@ -2,20 +2,22 @@ package main
 
 import (
 	"github.com/couchbaselabs/logg"
+	"github.com/tleyden/checkerlution"
 	ng "github.com/tleyden/neurgo"
 )
 
 func init() {
 	logg.LogKeys["MAIN"] = true
-	logg.LogKeys["DEBUG"] = false
-	logg.LogKeys["NEURGO"] = false
-	logg.LogKeys["NODE_PRE_SEND"] = false
-	logg.LogKeys["NODE_POST_SEND"] = false
-	logg.LogKeys["NODE_POST_RECV"] = false
-	logg.LogKeys["NODE_STATE"] = false
+	logg.LogKeys["DEBUG"] = true
+	logg.LogKeys["NEURGO"] = true
+	logg.LogKeys["NODE_PRE_SEND"] = true
+	logg.LogKeys["NODE_POST_SEND"] = true
+	logg.LogKeys["NODE_POST_RECV"] = true
+	logg.LogKeys["NODE_STATE"] = true
 	ng.SeedRandom()
 }
 
 func main() {
-	runTopologyMutatingTrainer()
+	// checkerlution.RunTopologyMutatingTrainer()
+	checkerlution.RunPopulationTrainer()
 }
