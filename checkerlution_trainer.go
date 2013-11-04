@@ -57,17 +57,9 @@ func RunPopulationTrainer() {
 
 func RunTopologyMutatingTrainer() {
 
-	// create a checkerlution instance just to create a cortex (kludgy)
-	thinker := &Checkerlution{}
-	thinker.SetMode(TRAINING_MODE)
-	thinker.CreateNeurgoCortex()
-	// thinker.LoadNeurgoCortex("cortex_avg8.json")
-	cortex := thinker.Cortex()
-
 	// setup the scape
 	checkersBotFlags := cbot.ParseCmdLine()
 	scape := &CheckerlutionScape{}
-	scape.SetThinker(thinker)
 	scape.SetSyncGatewayUrl(checkersBotFlags.SyncGatewayUrl)
 	scape.SetFeedType(checkersBotFlags.FeedType)
 	scape.SetTeam(checkersBotFlags.Team)
@@ -87,7 +79,8 @@ func RunTopologyMutatingTrainer() {
 		MaxIterationsBeforeRestart: 5,
 		StochasticHillClimber:      shc,
 	}
-	cortexTrained, succeeded := tmt.Train(cortex, scape)
+	initialCortex := getInitialCortex()
+	cortexTrained, succeeded := tmt.Train(initialCortex, scape)
 	if succeeded {
 		logg.LogTo("MAIN", "Training succeeded")
 	} else {
@@ -106,11 +99,15 @@ func getInitialPopulation() (population []*ng.Cortex) {
 
 		thinker := &Checkerlution{}
 
-		// probably a bug, because the cortex is now "bound" to this
-		// thinker .. but we're discarding the thinker
 		thinker.CreateNeurgoCortex()
 
 		population = append(population, thinker.Cortex())
 	}
 	return
+}
+
+func getInitialCortex() (cortex *ng.Cortex) {
+	thinker := &Checkerlution{}
+	thinker.CreateNeurgoCortex()
+	return thinker.Cortex()
 }

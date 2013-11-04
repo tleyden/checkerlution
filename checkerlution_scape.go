@@ -9,7 +9,6 @@ import (
 )
 
 type CheckerlutionScape struct {
-	thinker               *Checkerlution
 	team                  cbot.TeamType
 	syncGatewayUrl        string
 	feedType              cbot.FeedType
@@ -26,17 +25,19 @@ func (scape *CheckerlutionScape) Fitness(cortex *ng.Cortex) (fitness float64) {
 
 		cortex.Init()
 
-		// play a game of checkers
-		scape.thinker.StartWithCortex(cortex, scape.team)
-		game := cbot.NewGame(scape.team, scape.thinker)
+		// create a checkerlution instance
+		thinker := &Checkerlution{}
+		thinker.SetMode(TRAINING_MODE)
+		thinker.StartWithCortex(cortex, scape.team)
+
+		game := cbot.NewGame(scape.team, thinker)
 		game.SetServerUrl(scape.syncGatewayUrl)
 		game.SetFeedType(scape.feedType)
 		game.SetDelayBeforeMove(scape.randomDelayBeforeMove)
 		game.GameLoop()
 		logg.LogTo("DEBUG", "gameLoop finished")
 
-		// get result (TODO: this feels clunky, just call thinker.calcFitness() here)
-		latestFitness := scape.thinker.latestFitnessScore
+		latestFitness := thinker.latestFitnessScore
 		logg.LogTo("MAIN", "Fitness: %v", latestFitness)
 		fitnessVals = append(fitnessVals, latestFitness)
 
@@ -65,10 +66,6 @@ func (scape *CheckerlutionScape) Fitness(cortex *ng.Cortex) (fitness float64) {
 
 	return
 
-}
-
-func (scape *CheckerlutionScape) SetThinker(thinker *Checkerlution) {
-	scape.thinker = thinker
 }
 
 func (scape *CheckerlutionScape) SetSyncGatewayUrl(syncGatewayUrl string) {
