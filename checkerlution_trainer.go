@@ -20,17 +20,11 @@ func RunPopulationTrainer() {
 	scape.SetTeam(checkersBotFlags.Team)
 	scape.SetRandomDelayBeforeMove(checkersBotFlags.RandomDelayBeforeMove)
 
-	noOpCortexMutator := func(cortex *ng.Cortex) (success bool, result nv.MutateResult) {
-		success = true
-		result = "nothing"
-		return
-	}
-
 	// create population trainer ...
 	pt := &nv.PopulationTrainer{
 		FitnessThreshold: 150,
 		MaxGenerations:   1,
-		CortexMutator:    noOpCortexMutator,
+		CortexMutator:    nv.NoOpMutator,
 	}
 
 	population := getInitialPopulation()
