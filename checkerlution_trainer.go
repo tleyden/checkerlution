@@ -23,8 +23,8 @@ func RunPopulationTrainer() {
 	// create population trainer ...
 	pt := &nv.PopulationTrainer{
 		FitnessThreshold: 150,
-		MaxGenerations:   1,
-		CortexMutator:    nv.NoOpMutator,
+		MaxGenerations:   5,
+		CortexMutator:    nv.MutateAllWeightsBellCurve,
 	}
 
 	population := getInitialPopulation()
