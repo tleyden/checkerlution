@@ -13,7 +13,7 @@ type CheckerlutionScapeTwoPlayer struct {
 	randomDelayBeforeMove int
 }
 
-func (scape *CheckerlutionScapeTwoPlayer) Fitness(cortex *ng.Cortex, opponentCortex *ng.Cortex) (fitness float64) {
+func (scape *CheckerlutionScapeTwoPlayer) FitnessAgainst(cortex *ng.Cortex, opponentCortex *ng.Cortex) (fitness float64) {
 
 	logg.LogTo("DEBUG", "CheckerlutionScapeTwoPlayer fitness called")
 	if cortex == opponentCortex {
@@ -68,6 +68,13 @@ func (scape *CheckerlutionScapeTwoPlayer) Fitness(cortex *ng.Cortex, opponentCor
 
 	return
 
+}
+
+func (scape *CheckerlutionScapeTwoPlayer) Fitness(cortex *ng.Cortex) (fitness float64) {
+	// TODO: just play against a randomized version of itself in this case?
+	logg.LogPanic("Checkerlution requires an opponent to calculate fitness")
+	fitness = 0.0
+	return
 }
 
 func (scape *CheckerlutionScapeTwoPlayer) runGameLoops(games []*cbot.Game) {

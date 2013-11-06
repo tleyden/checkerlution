@@ -68,6 +68,12 @@ func (scape *CheckerlutionScape) Fitness(cortex *ng.Cortex) (fitness float64) {
 
 }
 
+func (scape *CheckerlutionScape) FitnessAgainst(cortex *ng.Cortex, opponentCortex *ng.Cortex) (fitness float64) {
+	logg.LogPanic("Not implemented")
+	fitness = 0.0
+	return
+}
+
 func (scape *CheckerlutionScape) SetSyncGatewayUrl(syncGatewayUrl string) {
 	scape.syncGatewayUrl = syncGatewayUrl
 }

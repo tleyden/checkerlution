@@ -25,6 +25,7 @@ func RunPopulationTrainer() {
 		FitnessThreshold: 150,
 		MaxGenerations:   5,
 		CortexMutator:    nv.MutateAllWeightsBellCurve,
+		NumOpponents:     5,
 	}
 
 	population := getInitialPopulation()
@@ -37,12 +38,12 @@ func RunPopulationTrainer() {
 		logg.LogTo("MAIN", "Training Failed")
 	}
 
-	for i, fitCortex := range fitPopulation {
+	for i, evaldCortex := range fitPopulation {
 
-		logg.LogTo("MAIN", "Cortex %d fitness: %v", i, fitCortex.Fitness)
+		logg.LogTo("MAIN", "Cortex %d fitness: %v", i, evaldCortex.Fitness)
 		filename := fmt.Sprintf("/tmp/checkerlution-%v.json", time.Now().Unix())
 		logg.LogTo("MAIN", "Saving Cortex to %v", filename)
-		cortex := fitCortex.Cortex
+		cortex := evaldCortex.Cortex
 		cortex.MarshalJSONToFile(filename)
 
 	}
