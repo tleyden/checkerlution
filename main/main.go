@@ -20,6 +20,6 @@ func init() {
 }
 
 func main() {
-	checkerlution.RunTopologyMutatingTrainer()
-	// checkerlution.RunPopulationTrainer()
+	// checkerlution.RunTopologyMutatingTrainer()
+	checkerlution.RunPopulationTrainer()
 }

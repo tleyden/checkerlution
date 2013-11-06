@@ -14,7 +14,7 @@ func RunPopulationTrainer() {
 
 	// setup the scape
 	checkersBotFlags := cbot.ParseCmdLine()
-	scape := &CheckerlutionScapeTwoPlayer{}
+	scape := &CheckerlutionScape{}
 	scape.SetSyncGatewayUrl(checkersBotFlags.SyncGatewayUrl)
 	scape.SetFeedType(checkersBotFlags.FeedType)
 	scape.SetTeam(checkersBotFlags.Team)
