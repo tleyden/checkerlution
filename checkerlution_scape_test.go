@@ -25,8 +25,8 @@ func TestLookupFitnessHistory(t *testing.T) {
 	fitnessOpponent := -10.0
 
 	scape.recordFitness(cortex, fitness, opponentCortex, fitnessOpponent)
-	retrievedFitness, isPresent := scape.lookupFitnessHistory(opponentCortex, cortex)
+	retrievedFitness, isPresent := scape.lookupFitnessHistory(cortex, opponentCortex)
 	assert.True(t, isPresent)
-	assert.Equals(t, retrievedFitness, -10.0)
+	assert.Equals(t, retrievedFitness, 10.0)
 
 }
