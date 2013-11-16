@@ -24,7 +24,7 @@ func RunPopulationTrainer() {
 	pt := &nv.PopulationTrainer{
 		FitnessThreshold: 150,
 		MaxGenerations:   5,
-		CortexMutator:    nv.MutateAllWeightsBellCurve,
+		CortexMutator:    nv.TopologyOrWeightMutator,
 		NumOpponents:     5,
 	}
 
