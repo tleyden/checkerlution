@@ -22,10 +22,10 @@ func RunPopulationTrainer() {
 
 	// create population trainer ...
 	pt := &nv.PopulationTrainer{
-		FitnessThreshold: 150,
+		FitnessThreshold: 170,
 		MaxGenerations:   5,
 		CortexMutator:    nv.TopologyOrWeightMutator,
-		NumOpponents:     5,
+		NumOpponents:     2,
 	}
 
 	population := getInitialPopulation()
@@ -90,7 +90,7 @@ func RunTopologyMutatingTrainer() {
 
 func getInitialPopulation() (population []*ng.Cortex) {
 	population = make([]*ng.Cortex, 0)
-	for i := 0; i < 30; i++ {
+	for i := 0; i < 6; i++ {
 
 		thinker := &Checkerlution{}
 
