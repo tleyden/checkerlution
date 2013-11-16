@@ -15,7 +15,6 @@ type CheckerlutionScape struct {
 
 func (scape *CheckerlutionScape) FitnessAgainst(cortex *ng.Cortex, opponentCortex *ng.Cortex) (fitness float64) {
 
-	logg.LogTo("DEBUG", "CheckerlutionScape fitnessagainst called")
 	if cortex == opponentCortex {
 		logg.LogPanic("Cannot calculate fitnesss between cortex %p and itself %p", cortex, opponentCortex)
 	}
@@ -47,21 +46,23 @@ func (scape *CheckerlutionScape) FitnessAgainst(cortex *ng.Cortex, opponentCorte
 	gameOpponent.SetDelayBeforeMove(scape.randomDelayBeforeMove)
 
 	// run both game loops and wait for both to finish
-	logg.LogTo("DEBUG", "Started games")
+	logg.LogTo("CHECKERLUTION_SCAPE", "Started games")
 	games := []*cbot.Game{game, gameOpponent}
 	scape.runGameLoops(games)
 
 	fitness = thinker.latestFitnessScore
-	logg.LogTo("MAIN", "Fitness: %v", fitness)
+	fitnessOpponent := thinkerOpponent.latestFitnessScore
+
+	logg.LogTo("CHECKERLUTION_SCAPE", "Fitness (us): %v", fitness)
+	logg.LogTo("CHECKERLUTION_SCAPE", "Fitness (opponent): %v", fitnessOpponent)
 
 	// wait until the game number increments, otherwise on the
 	// next callback to this method, we'll jump into a game which
 	// is already over.
-	logg.LogTo("MAIN", "Wait For Next Game ..")
+	logg.LogTo("CHECKERLUTION_SCAPE", "Wait For Next Game ..")
 	game.WaitForNextGame()
-
-	logg.LogTo("MAIN", "Wait For Next Opponent Game ..")
 	gameOpponent.WaitForNextGame()
+	logg.LogTo("CHECKERLUTION_SCAPE", "Done waiting For Next Game ..")
 
 	cortex.Shutdown()
 	opponentCortex.Shutdown()
@@ -70,6 +71,8 @@ func (scape *CheckerlutionScape) FitnessAgainst(cortex *ng.Cortex, opponentCorte
 }
 
 func (scape *CheckerlutionScape) Fitness(cortex *ng.Cortex) (fitness float64) {
+
+	logg.LogTo("CHECKERLUTION_SCAPE", "CheckerlutionScape Fitness() called, create random opponent")
 
 	// create an opponent
 	thinker := &Checkerlution{}

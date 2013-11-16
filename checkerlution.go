@@ -43,7 +43,7 @@ func (c *Checkerlution) Think(gameState cbot.GameState) (bestMove cbot.ValidMove
 	gameStateVector := c.extractGameStateVector(gameState)
 	possibleMoves := c.extractPossibleMoves(gameState)
 	if len(possibleMoves) == 0 {
-		logg.LogTo("DEBUG", "No possibleMoves, ignoring changes")
+		logg.LogTo("CHECKERLUTION", "No possibleMoves, ignoring changes")
 		ok = false
 		return
 	}
@@ -75,7 +75,7 @@ func (c Checkerlution) calculateFitness(gameState cbot.GameState) (fitness float
 	weWon := (gameState.WinningTeam == c.ourTeamId)
 	switch weWon {
 	case true:
-		logg.LogTo("DEBUG", "calculateFitness based on winning")
+		logg.LogTo("CHECKERLUTION", "calculateFitness based on winning.  Turn: %v", gameState.Turn)
 		// fitness will be a positive number
 		// the least amount of moves we made, the higher the fitness
 		fitness = 200
@@ -84,7 +84,7 @@ func (c Checkerlution) calculateFitness(gameState cbot.GameState) (fitness float
 			fitness = 1 // lowest possible fitness when winning
 		}
 	case false:
-		logg.LogTo("DEBUG", "calculateFitness based on losing")
+		logg.LogTo("CHECKERLUTION", "calculateFitness based on losing.  Turn: %v", gameState.Turn)
 		// fitness will be a negative number
 		// the least amount of moves we made, the lower (more negative)
 		// the fitness, because we didn't put up much of a fight
@@ -95,7 +95,7 @@ func (c Checkerlution) calculateFitness(gameState cbot.GameState) (fitness float
 		}
 	}
 
-	logg.LogTo("DEBUG", "calculateFitness returning: %v", fitness)
+	logg.LogTo("CHECKERLUTION", "calculateFitness returning: %v", fitness)
 	return
 }
 
@@ -134,27 +134,27 @@ func (c Checkerlution) extractPossibleMoves(gameState cbot.GameState) []ValidMov
 func (c *Checkerlution) chooseBestMove(gameStateVector GameStateVector, possibleMoves []ValidMoveCortexInput) (bestMove ValidMoveCortexInput) {
 
 	c.currentGameState = gameStateVector
-	logg.LogTo("DEBUG", "gameStateVector: %v", gameStateVector)
+	logg.LogTo("CHECKERLUTION", "gameStateVector: %v", gameStateVector)
 
 	var bestMoveRating []float64
 	bestMoveRating = []float64{-1000000000}
 
 	for _, move := range possibleMoves {
 
-		logg.LogTo("DEBUG", "feed possible move to cortex: %v", move)
+		logg.LogTo("CHECKERLUTION", "feed possible move to cortex: %v", move)
 
 		// present it to the neural net
 		c.currentPossibleMove = move
 		c.cortex.SyncSensors()
 		c.cortex.SyncActuators()
 
-		logg.LogTo("DEBUG", "actuator output %v bestMoveRating: %v", c.latestActuatorOutput[0], bestMoveRating[0])
+		logg.LogTo("CHECKERLUTION", "actuator output %v bestMoveRating: %v", c.latestActuatorOutput[0], bestMoveRating[0])
 		if c.latestActuatorOutput[0] > bestMoveRating[0] {
-			logg.LogTo("DEBUG", "actuator output > bestMoveRating")
+			logg.LogTo("CHECKERLUTION", "actuator output > bestMoveRating")
 			bestMove = move
 			bestMoveRating[0] = c.latestActuatorOutput[0]
 		} else {
-			logg.LogTo("DEBUG", "actuator output < bestMoveRating, ignoring")
+			logg.LogTo("CHECKERLUTION", "actuator output < bestMoveRating, ignoring")
 		}
 
 	}
@@ -246,7 +246,7 @@ func (c *Checkerlution) CreateActuator() {
 
 func (c *Checkerlution) actuatorFunc() ng.ActuatorFunction {
 	return func(outputs []float64) {
-		logg.LogTo("DEBUG", "actuator func called with: %v", outputs)
+		logg.LogTo("CHECKERLUTION", "actuator func called with: %v", outputs)
 		c.latestActuatorOutput = outputs
 	}
 }
@@ -274,7 +274,7 @@ func (c *Checkerlution) CreateSensors() {
 
 func (c *Checkerlution) sensorFuncGameState() ng.SensorFunction {
 	return func(syncCounter int) []float64 {
-		logg.LogTo("DEBUG", "sensor func game state called on thinker: %p, returning: %v", c, c.currentGameState)
+		logg.LogTo("CHECKERLUTION", "sensor func game state called on thinker: %p, returning: %v", c, c.currentGameState)
 		if len(c.currentGameState) == 0 {
 			logg.LogPanic("sensor would return invalid gamestate")
 		}
@@ -284,7 +284,7 @@ func (c *Checkerlution) sensorFuncGameState() ng.SensorFunction {
 
 func (c *Checkerlution) sensorFuncPossibleMove() ng.SensorFunction {
 	return func(syncCounter int) []float64 {
-		logg.LogTo("DEBUG", "sensor func possible move called")
+		logg.LogTo("CHECKERLUTION", "sensor func possible move called")
 		return c.currentPossibleMove.VectorRepresentation()
 	}
 }
