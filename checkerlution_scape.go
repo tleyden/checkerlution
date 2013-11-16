@@ -121,10 +121,6 @@ func (scape *CheckerlutionScape) recordFitness(cortex *ng.Cortex, fitness float6
 	key := fmt.Sprintf("%v-%v", cortex.NodeId.UUID, opponentCortex.NodeId.UUID)
 	scape.fitnessHistory[key] = fitness
 
-	// also record the reverse direction - them vs us fitness
-	key = fmt.Sprintf("%v-%v", opponentCortex.NodeId.UUID, cortex.NodeId.UUID)
-	scape.fitnessHistory[key] = fitnessOpponent
-
 }
 
 func (scape *CheckerlutionScape) lookupFitnessHistory(cortex *ng.Cortex, opponentCortex *ng.Cortex) (fitness float64, isPresent bool) {
