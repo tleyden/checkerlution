@@ -1,25 +1,33 @@
 package main
 
 import (
+	_ "expvar"
 	"github.com/couchbaselabs/logg"
 	"github.com/tleyden/checkerlution"
 	ng "github.com/tleyden/neurgo"
+	"net/http"
 )
 
 func init() {
 	logg.LogKeys["MAIN"] = true
 	logg.LogKeys["DEBUG"] = true
-	logg.LogKeys["NEURGO"] = true
-	logg.LogKeys["SENSOR_SYNC"] = true
-	logg.LogKeys["ACTUATOR_SYNC"] = true
-	logg.LogKeys["NODE_PRE_SEND"] = true
-	logg.LogKeys["NODE_POST_SEND"] = true
-	logg.LogKeys["NODE_POST_RECV"] = true
-	logg.LogKeys["NODE_STATE"] = true
+	logg.LogKeys["CHECKERLUTION_SCAPE"] = true
+	logg.LogKeys["NEURGO"] = false
+	logg.LogKeys["SENSOR_SYNC"] = false
+	logg.LogKeys["ACTUATOR_SYNC"] = false
+	logg.LogKeys["NODE_PRE_SEND"] = false
+	logg.LogKeys["NODE_POST_SEND"] = false
+	logg.LogKeys["NODE_POST_RECV"] = false
+	logg.LogKeys["NODE_STATE"] = false
 	ng.SeedRandom()
 }
 
 func main() {
-	checkerlution.RunTopologyMutatingTrainer()
-	// checkerlution.RunPopulationTrainer()
+
+	// run a webserver in order to view expvar output
+	// at http://localhost:8080/debug/vars
+	go http.ListenAndServe(":8080", nil)
+
+	// checkerlution.RunTopologyMutatingTrainer()
+	checkerlution.RunPopulationTrainer()
 }
