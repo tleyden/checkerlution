@@ -1,6 +1,7 @@
 package checkerlution
 
 import (
+	"fmt"
 	"github.com/couchbaselabs/logg"
 	cbot "github.com/tleyden/checkers-bot"
 	ng "github.com/tleyden/neurgo"
@@ -164,7 +165,10 @@ func (c *Checkerlution) chooseBestMove(gameStateVector GameStateVector, possible
 
 func (c *Checkerlution) CreateNeurgoCortex() {
 
-	nodeId := ng.NewCortexId("cortex")
+	uuid := ng.NewUuid()
+	cortexUuid := fmt.Sprintf("cortex-%s", uuid)
+	nodeId := ng.NewCortexId(cortexUuid)
+
 	c.cortex = &ng.Cortex{
 		NodeId: nodeId,
 	}
