@@ -1,6 +1,7 @@
 package checkerlution
 
 import (
+	"fmt"
 	"github.com/couchbaselabs/logg"
 	cbot "github.com/tleyden/checkers-bot"
 	ng "github.com/tleyden/neurgo"
@@ -11,12 +12,20 @@ type CheckerlutionScape struct {
 	syncGatewayUrl        string
 	feedType              cbot.FeedType
 	randomDelayBeforeMove int
+	fitnessHistory        map[string]float64
 }
 
 func (scape *CheckerlutionScape) FitnessAgainst(cortex *ng.Cortex, opponentCortex *ng.Cortex) (fitness float64) {
 
 	if cortex == opponentCortex {
 		logg.LogPanic("Cannot calculate fitnesss between cortex %p and itself %p", cortex, opponentCortex)
+	}
+
+	savedFitness, isPresent := scape.lookupFitnessHistory(cortex, opponentCortex)
+	if isPresent {
+		fitness = savedFitness
+		logg.LogTo("CHECKERLUTION_SCAPE", "Fitness from history (us %v): %v", cortex.NodeId.UUID, fitness)
+		return
 	}
 
 	cortex.Init()
@@ -46,15 +55,18 @@ func (scape *CheckerlutionScape) FitnessAgainst(cortex *ng.Cortex, opponentCorte
 	gameOpponent.SetDelayBeforeMove(scape.randomDelayBeforeMove)
 
 	// run both game loops and wait for both to finish
-	logg.LogTo("CHECKERLUTION_SCAPE", "Started games")
+	logg.LogTo("CHECKERLUTION_SCAPE", "Started game: %v vs %v", cortex.NodeId.UUID, opponentCortex.NodeId.UUID)
 	games := []*cbot.Game{game, gameOpponent}
 	scape.runGameLoops(games)
+	logg.LogTo("CHECKERLUTION_SCAPE", "Game finished after %v turns", game.Turn())
 
 	fitness = thinker.latestFitnessScore
 	fitnessOpponent := thinkerOpponent.latestFitnessScore
 
-	logg.LogTo("CHECKERLUTION_SCAPE", "Fitness (us): %v", fitness)
-	logg.LogTo("CHECKERLUTION_SCAPE", "Fitness (opponent): %v", fitnessOpponent)
+	logg.LogTo("CHECKERLUTION_SCAPE", "Fitness (us %v): %v", cortex.NodeId.UUID, fitness)
+	logg.LogTo("CHECKERLUTION_SCAPE", "Fitness (opponent %v): %v", opponentCortex.NodeId.UUID, fitnessOpponent)
+
+	scape.recordFitness(cortex, fitness, opponentCortex, fitnessOpponent)
 
 	// wait until the game number increments, otherwise on the
 	// next callback to this method, we'll jump into a game which
@@ -96,6 +108,30 @@ func (scape *CheckerlutionScape) runGameLoops(games []*cbot.Game) {
 	for _, _ = range games {
 		<-resultChannel
 	}
+
+}
+
+func (scape *CheckerlutionScape) recordFitness(cortex *ng.Cortex, fitness float64, opponentCortex *ng.Cortex, fitnessOpponent float64) {
+
+	if scape.fitnessHistory == nil {
+		scape.fitnessHistory = make(map[string]float64)
+	}
+
+	// record the fitness score of us vs them
+	key := fmt.Sprintf("%v-%v", cortex.NodeId.UUID, opponentCortex.NodeId.UUID)
+	scape.fitnessHistory[key] = fitness
+
+	// also record the reverse direction - them vs us fitness
+	key = fmt.Sprintf("%v-%v", opponentCortex.NodeId.UUID, cortex.NodeId.UUID)
+	scape.fitnessHistory[key] = fitnessOpponent
+
+}
+
+func (scape *CheckerlutionScape) lookupFitnessHistory(cortex *ng.Cortex, opponentCortex *ng.Cortex) (fitness float64, isPresent bool) {
+
+	key := fmt.Sprintf("%v-%v", cortex.NodeId.UUID, opponentCortex.NodeId.UUID)
+	fitness, isPresent = scape.fitnessHistory[key]
+	return
 
 }
 
