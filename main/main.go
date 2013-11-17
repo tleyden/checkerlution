@@ -28,6 +28,11 @@ func main() {
 	// at http://localhost:8080/debug/vars
 	go http.ListenAndServe(":8080", nil)
 
+	trainer := &checkerlution.CheckerlutionTrainer{}
+
+	checkerlution.RegisterHandlers(trainer)
+
 	// checkerlution.RunTopologyMutatingTrainer()
-	checkerlution.RunPopulationTrainer()
+	trainer.RunPopulationTrainer()
+
 }
