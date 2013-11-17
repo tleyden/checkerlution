@@ -67,7 +67,14 @@ func RegisterHandlers(trainer *CheckerlutionTrainer) {
 }
 
 func HomeHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "Endpoints: /cortex/{cortex_uuid} and /cortex/{cortex_uuid}/svg")
+	routeMap := make(map[string]string)
+	routeMap["/cortex"] = "Show All Cortexes"
+	routeMap["/cortex/uuid"] = "Show All Cortex Uuids"
+	routeMap["/cortex/tmpfile"] = "Save All Cortexes to temp files"
+	routeMap["/cortex/{cortex_uuid}"] = "Show Cortex for uuid"
+	routeMap["/cortex/{cortex_uuid}/svg"] = "Show Cortex SVG for uuid"
+	routeMap["/cortex/{cortex_uuid}/tmpfile"] = "Save single cortex to temp file"
+	marshalJson(routeMap, w)
 }
 
 func marshalJson(v interface{}, w http.ResponseWriter) {
@@ -79,7 +86,6 @@ func marshalJson(v interface{}, w http.ResponseWriter) {
 	if err != nil {
 		fmt.Fprintf(w, "Error writing response: %v", err)
 	}
-
 }
 
 func saveCortex(cortex *ng.Cortex) (filename string, filenameSvg string) {
