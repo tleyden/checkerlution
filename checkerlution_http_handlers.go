@@ -24,11 +24,13 @@ func RegisterHandlers(trainer *CheckerlutionTrainer) {
 	}
 
 	saveAllCortexes := func(w http.ResponseWriter, r *http.Request) {
-		// saveMap := make(map[string][]string)
+		saveMap := make(map[string][]string)
 		for _, cortex := range trainer.population {
 			filename, filenameSvg := saveCortex(cortex)
-			fmt.Fprintf(w, "Json: %v Svg: %v", filename, filenameSvg)
+			filenames := []string{filename, filenameSvg}
+			saveMap[cortex.NodeId.UUID] = filenames
 		}
+		marshalJson(saveMap, w)
 	}
 
 	showCortex := func(w http.ResponseWriter, r *http.Request) {
@@ -82,9 +84,10 @@ func marshalJson(v interface{}, w http.ResponseWriter) {
 
 func saveCortex(cortex *ng.Cortex) (filename string, filenameSvg string) {
 	unixTimestamp := time.Now().Unix()
-	filename = fmt.Sprintf("/tmp/cortex-%v.json", unixTimestamp)
+	uuid := cortex.NodeId.UUID
+	filename = fmt.Sprintf("/tmp/%v-%v.json", uuid, unixTimestamp)
 	cortex.MarshalJSONToFile(filename)
-	filenameSvg = fmt.Sprintf("/tmp/cortex-%v.svg", unixTimestamp)
+	filenameSvg = fmt.Sprintf("/tmp/%v-%v.svg", uuid, unixTimestamp)
 	cortex.RenderSVGFile(filenameSvg)
 	return
 }
