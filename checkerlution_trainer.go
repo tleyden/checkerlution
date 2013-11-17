@@ -10,9 +10,7 @@ import (
 	"time"
 )
 
-type CheckerlutionTrainer struct {
-	population nv.CortexPopulation
-}
+type CheckerlutionTrainer struct{}
 
 func (trainer *CheckerlutionTrainer) RunPopulationTrainer() {
 
@@ -33,7 +31,7 @@ func (trainer *CheckerlutionTrainer) RunPopulationTrainer() {
 	}
 
 	population := getInitialPopulation()
-	trainer.population = population
+	nv.RegisterHandlers(population)
 
 	fitPopulation, succeeded := pt.Train(population, scape)
 
@@ -55,7 +53,7 @@ func (trainer *CheckerlutionTrainer) RunPopulationTrainer() {
 
 }
 
-func RunTopologyMutatingTrainer() {
+func (trainer *CheckerlutionTrainer) RunTopologyMutatingTrainer() {
 
 	// setup the scape
 	checkersBotFlags := cbot.ParseCmdLine()

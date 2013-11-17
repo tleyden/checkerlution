@@ -30,8 +30,6 @@ func main() {
 
 	trainer := &checkerlution.CheckerlutionTrainer{}
 
-	checkerlution.RegisterHandlers(trainer)
-
 	// checkerlution.RunTopologyMutatingTrainer()
 	trainer.RunPopulationTrainer()
 
