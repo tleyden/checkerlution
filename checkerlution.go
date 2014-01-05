@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/couchbaselabs/logg"
 	cbot "github.com/tleyden/checkers-bot"
+	core "github.com/tleyden/checkers-core"
 	ng "github.com/tleyden/neurgo"
 )
 
@@ -39,7 +40,7 @@ func (c *Checkerlution) StartWithCortex(cortex *ng.Cortex, ourTeamId cbot.TeamTy
 	cortex.Run()
 }
 
-func (c *Checkerlution) Think(gameState cbot.GameState) (bestMove cbot.ValidMove, ok bool) {
+func (c *Checkerlution) ThinkOLD(gameState cbot.GameState) (bestMove cbot.ValidMove, ok bool) {
 	ok = true
 	gameStateVector := c.extractGameStateVector(gameState)
 	possibleMoves := c.extractPossibleMoves(gameState)
@@ -51,6 +52,45 @@ func (c *Checkerlution) Think(gameState cbot.GameState) (bestMove cbot.ValidMove
 	bestMoveCortex := c.chooseBestMove(gameStateVector, possibleMoves)
 	bestMove = bestMoveCortex.validMove
 	return
+}
+
+func (c *Checkerlution) Think(gameState cbot.GameState) (bestMove cbot.ValidMove, ok bool) {
+
+	ok = true
+	ourTeam := gameState.Teams[c.ourTeamId]
+	allValidMoves := ourTeam.AllValidMoves()
+	if len(allValidMoves) > 0 {
+
+		// convert into core.board representation
+		board := gameState.Export()
+		logg.LogTo("DEBUG", "Before move %v", board.CompactString(true))
+
+		// generate best move (will be a core.move) -- initially, pick random
+		move := c.generateBestMove(board)
+
+		// search allValidMoves to find corresponding valid move
+		found, bestValidMoveIndex := cbot.CorrespondingValidMoveIndex(move, allValidMoves)
+
+		if !found {
+			msg := "Could not find corresponding valid move: %v in %v"
+			logg.LogPanic(msg, move, allValidMoves)
+		} else {
+			bestMove = allValidMoves[bestValidMoveIndex]
+		}
+
+		// this is just for debugging purposes
+		player := cbot.GetCorePlayer(c.ourTeamId)
+		boardPostMove := board.ApplyMove(player, move)
+		logg.LogTo("DEBUG", "After move %v", boardPostMove.CompactString(true))
+
+		return
+
+	} else {
+		ok = false
+	}
+
+	return
+
 }
 
 func (c *Checkerlution) GameFinished(gameState cbot.GameState) (shouldQuit bool) {
@@ -294,5 +334,36 @@ func (c *Checkerlution) sensorFuncPossibleMove() ng.SensorFunction {
 }
 
 func (c Checkerlution) Stop() {
+
+}
+
+func (c Checkerlution) generateBestMove(board core.Board) core.Move {
+	evalFunc := c.getEvaluationFunction()
+	player := cbot.GetCorePlayer(c.ourTeamId)
+	depth := 6 // TODO: crank this up higher
+	bestMove, scorePostMove := board.Minimax(player, depth, evalFunc)
+	logg.LogTo("DEBUG", "scorePostMove: %v", scorePostMove)
+	return bestMove
+}
+
+func (c Checkerlution) getEvaluationFunction() core.EvaluationFunction {
+
+	evalFunc := func(currentPlayer core.Player, board core.Board) float64 {
+
+		// cortex := c.cortex
+		// player := cbot.GetCorePlayer(c.ourTeamId)
+
+		// convert the board into inputs for the neural net (32 elt vector)
+		// taking into account whether this player is "us" or not
+
+		// send input to the neural net
+
+		// get output
+
+		// return output
+		return 1.0
+
+	}
+	return evalFunc
 
 }
