@@ -40,20 +40,6 @@ func (c *Checkerlution) StartWithCortex(cortex *ng.Cortex, ourTeamId cbot.TeamTy
 	cortex.Run()
 }
 
-func (c *Checkerlution) ThinkOLD(gameState cbot.GameState) (bestMove cbot.ValidMove, ok bool) {
-	ok = true
-	gameStateVector := c.extractGameStateVector(gameState)
-	possibleMoves := c.extractPossibleMoves(gameState)
-	if len(possibleMoves) == 0 {
-		logg.LogTo("CHECKERLUTION", "No possibleMoves, ignoring changes")
-		ok = false
-		return
-	}
-	bestMoveCortex := c.chooseBestMove(gameStateVector, possibleMoves)
-	bestMove = bestMoveCortex.validMove
-	return
-}
-
 func (c *Checkerlution) Think(gameState cbot.GameState) (bestMove cbot.ValidMove, ok bool) {
 
 	ok = true
@@ -138,69 +124,6 @@ func (c Checkerlution) calculateFitness(gameState cbot.GameState) (fitness float
 
 	logg.LogTo("CHECKERLUTION", "calculateFitness returning: %v", fitness)
 	return
-}
-
-func (c Checkerlution) extractGameStateVector(gameState cbot.GameState) GameStateVector {
-	gameStateVector := NewGameStateVector()
-	gameStateVector.loadFromGameState(gameState, c.ourTeamId)
-	return gameStateVector
-}
-
-func (c Checkerlution) extractPossibleMoves(gameState cbot.GameState) []ValidMoveCortexInput {
-
-	moves := make([]ValidMoveCortexInput, 0)
-
-	ourTeam := gameState.Teams[c.ourTeamId]
-
-	for pieceIndex, piece := range ourTeam.Pieces {
-		for _, validMove := range piece.ValidMoves {
-
-			// enhance the validMove from some information
-			// from the piece, because this will be required
-			// later when translating this valid move into an
-			// "outgoing move", eg, a move that can be posted
-			// to server to cause it to make.  the outgoing move
-			// is a pretty different format than the orig validMove
-			validMove.StartLocation = piece.Location
-			validMove.PieceId = pieceIndex
-
-			moveInput := NewValidMoveCortexInput(validMove, piece)
-			moves = append(moves, moveInput)
-		}
-	}
-
-	return moves
-}
-
-func (c *Checkerlution) chooseBestMove(gameStateVector GameStateVector, possibleMoves []ValidMoveCortexInput) (bestMove ValidMoveCortexInput) {
-
-	c.currentGameState = gameStateVector
-	logg.LogTo("CHECKERLUTION", "gameStateVector: %v", gameStateVector)
-
-	var bestMoveRating []float64
-	bestMoveRating = []float64{-1000000000}
-
-	for _, move := range possibleMoves {
-
-		logg.LogTo("CHECKERLUTION", "feed possible move to cortex: %v", move)
-
-		// present it to the neural net
-		c.currentPossibleMove = move
-		c.cortex.SyncSensors()
-		c.cortex.SyncActuators()
-
-		logg.LogTo("CHECKERLUTION", "actuator output %v bestMoveRating: %v", c.latestActuatorOutput[0], bestMoveRating[0])
-		if c.latestActuatorOutput[0] > bestMoveRating[0] {
-			logg.LogTo("CHECKERLUTION", "actuator output > bestMoveRating")
-			bestMove = move
-			bestMoveRating[0] = c.latestActuatorOutput[0]
-		} else {
-			logg.LogTo("CHECKERLUTION", "actuator output < bestMoveRating, ignoring")
-		}
-
-	}
-	return
-
 }
 
 func (c *Checkerlution) CreateNeurgoCortex() {
