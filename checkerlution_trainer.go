@@ -31,7 +31,7 @@ func (trainer *CheckerlutionTrainer) RunPopulationTrainer() {
 	}
 
 	population := getInitialPopulation()
-	nv.RegisterHandlers(population)
+	nv.RegisterHandlers(pt)
 
 	fitPopulation, succeeded := pt.Train(population, scape)
 
