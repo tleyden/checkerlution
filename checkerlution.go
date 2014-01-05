@@ -338,7 +338,12 @@ func (c Checkerlution) Stop() {
 func (c *Checkerlution) generateBestMove(board core.Board) core.Move {
 	evalFunc := c.getEvaluationFunction()
 	player := cbot.GetCorePlayer(c.ourTeamId)
-	depth := 5 // TODO: crank this up higher
+
+	// with depth = 5, not working too well on first move.  when
+	// there are only a few pieces on the board it seems to work,
+	// but with full board .. taking a long time.
+
+	depth := 4 // TODO: crank this up higher
 	bestMove, scorePostMove := board.Minimax(player, depth, evalFunc)
 	logg.LogTo("DEBUG", "scorePostMove: %v", scorePostMove)
 	return bestMove
