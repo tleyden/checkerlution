@@ -12,7 +12,7 @@ import (
 func init() {
 	logg.LogKeys["MAIN"] = true
 	logg.LogKeys["DEBUG"] = true
-	logg.LogKeys["CHECKERLUTION"] = true
+	logg.LogKeys["CHECKERLUTION"] = false
 	logg.LogKeys["CHECKERLUTION_SCAPE"] = true
 	logg.LogKeys["NEURGO"] = false
 	logg.LogKeys["SENSOR_SYNC"] = false
