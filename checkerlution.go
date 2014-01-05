@@ -135,10 +135,33 @@ func (c *Checkerlution) CreateNeurgoCortex() {
 	c.cortex = &ng.Cortex{
 		NodeId: nodeId,
 	}
+
+	c.cortex.Init()
+
 	c.CreateSensors()
-	c.CreateActuator()
-	c.CreateNeuron()
-	c.ConnectNodes()
+
+	outputNeuron := c.CreateOutputNeuron()
+	layer1Neurons := c.CreateHiddenLayer1Neurons(outputNeuron)
+	layer2Neurons := c.CreateHiddenLayer2Neurons(layer1Neurons, outputNeuron)
+
+	// combine all into single slice and add neurons to cortex
+	neurons := []*ng.Neuron{}
+	neurons = append(neurons, layer1Neurons...)
+	neurons = append(neurons, layer2Neurons...)
+	neurons = append(neurons, outputNeuron)
+	c.cortex.SetNeurons(neurons)
+
+	actuator := c.CreateActuator()
+
+	// workaround for error
+	// Cannot make outbound connection, dataChan == nil [recovered]
+	c.cortex.Init()
+
+	outputNeuron.ConnectOutbound(actuator)
+	actuator.ConnectInbound(outputNeuron)
+
+	c.cortex.MarshalJSONToFile("checkerlution_cortex.json")
+
 }
 
 func (c *Checkerlution) LoadNeurgoCortex(filename string) {
@@ -165,41 +188,98 @@ func (c *Checkerlution) setSensorActuatorFunctions(cortex *ng.Cortex) {
 
 }
 
-func (c *Checkerlution) ConnectNodes() {
+func (c *Checkerlution) CreateHiddenLayer1Neurons(outputNeuron *ng.Neuron) []*ng.Neuron {
 
 	cortex := c.cortex
+	neurons := []*ng.Neuron{}
+	layerIndex := 0.25
 
-	cortex.Init()
+	for i := 0; i < 40; i++ {
+		name := fmt.Sprintf("hidden-layer-1-n-%d", i)
+		neuron := &ng.Neuron{
+			ActivationFunction: ng.EncodableTanh(),
+			NodeId:             ng.NewNeuronId(name, layerIndex),
+			Bias:               ng.RandomBias(),
+		}
 
-	// connect sensors -> neuron(s)
-	for _, sensor := range cortex.Sensors {
-		for _, neuron := range cortex.Neurons {
+		// Workaround for error:
+		// Cannot make outbound connection, dataChan == nil [recovered]
+		// The best fix is to just load nn from json
+		neuron.Init()
+
+		for _, sensor := range cortex.Sensors {
 			sensor.ConnectOutbound(neuron)
 			weights := ng.RandomWeights(sensor.VectorLength)
 			neuron.ConnectInboundWeighted(sensor, weights)
 		}
-	}
 
-	// connect neuron to actuator
-	for _, neuron := range cortex.Neurons {
-		for _, actuator := range cortex.Actuators {
-			neuron.ConnectOutbound(actuator)
-			actuator.ConnectInbound(neuron)
-		}
+		// connect directly to output neuron
+		neuron.ConnectOutbound(outputNeuron)
+		weights := ng.RandomWeights(1)
+		outputNeuron.ConnectInboundWeighted(neuron, weights)
+
+		neurons = append(neurons, neuron)
+
 	}
+	return neurons
 
 }
 
-func (c *Checkerlution) CreateNeuron() {
+func (c *Checkerlution) CreateHiddenLayer2Neurons(layer1Neurons []*ng.Neuron, outputNeuron *ng.Neuron) []*ng.Neuron {
+
+	neurons := []*ng.Neuron{}
+	layerIndex := 0.35
+
+	for i := 0; i < 10; i++ {
+		name := fmt.Sprintf("hidden-layer-1-n-%d", i)
+		neuron := &ng.Neuron{
+			ActivationFunction: ng.EncodableTanh(),
+			NodeId:             ng.NewNeuronId(name, layerIndex),
+			Bias:               ng.RandomBias(),
+		}
+
+		// Workaround for error:
+		// Cannot make outbound connection, dataChan == nil [recovered]
+		// The best fix is to just load nn from json
+		neuron.Init()
+
+		for _, layer1Neuron := range layer1Neurons {
+			layer1Neuron.ConnectOutbound(neuron)
+			weights := ng.RandomWeights(1)
+			neuron.ConnectInboundWeighted(layer1Neuron, weights)
+		}
+
+		// connect directly to output neuron
+		neuron.ConnectOutbound(outputNeuron)
+		weights := ng.RandomWeights(1)
+		outputNeuron.ConnectInboundWeighted(neuron, weights)
+
+		neurons = append(neurons, neuron)
+
+	}
+	return neurons
+
+}
+
+func (c *Checkerlution) CreateOutputNeuron() *ng.Neuron {
+
+	layerIndex := 0.45
 	neuron := &ng.Neuron{
 		ActivationFunction: ng.EncodableTanh(),
-		NodeId:             ng.NewNeuronId("Neuron", 0.25),
+		NodeId:             ng.NewNeuronId("OutputNeuron", layerIndex),
 		Bias:               ng.RandomBias(),
 	}
-	c.cortex.SetNeurons([]*ng.Neuron{neuron})
+
+	// Workaround for error:
+	// Cannot make outbound connection, dataChan == nil [recovered]
+	// The best fix is to just load nn from json
+	neuron.Init()
+
+	return neuron
+
 }
 
-func (c *Checkerlution) CreateActuator() {
+func (c *Checkerlution) CreateActuator() *ng.Actuator {
 
 	actuatorNodeId := ng.NewActuatorId("Actuator", 0.5)
 	actuator := &ng.Actuator{
@@ -208,6 +288,7 @@ func (c *Checkerlution) CreateActuator() {
 		ActuatorFunction: c.actuatorFunc(),
 	}
 	c.cortex.SetActuators([]*ng.Actuator{actuator})
+	return actuator
 
 }
 
@@ -257,7 +338,7 @@ func (c Checkerlution) Stop() {
 func (c *Checkerlution) generateBestMove(board core.Board) core.Move {
 	evalFunc := c.getEvaluationFunction()
 	player := cbot.GetCorePlayer(c.ourTeamId)
-	depth := 6 // TODO: crank this up higher
+	depth := 5 // TODO: crank this up higher
 	bestMove, scorePostMove := board.Minimax(player, depth, evalFunc)
 	logg.LogTo("DEBUG", "scorePostMove: %v", scorePostMove)
 	return bestMove
