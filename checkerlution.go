@@ -306,13 +306,7 @@ func (c *Checkerlution) CreateSensors() {
 		SensorFunction: c.sensorFuncGameState(),
 	}
 
-	sensorPossibleMoveNodeId := ng.NewSensorId("SensorPossibleMove", sensorLayer)
-	sensorPossibleMove := &ng.Sensor{
-		NodeId:         sensorPossibleMoveNodeId,
-		VectorLength:   5, // start_location, is_king, final_location, will_be_king, amt_would_capture
-		SensorFunction: c.sensorFuncPossibleMove(),
-	}
-	c.cortex.SetSensors([]*ng.Sensor{sensorGameState, sensorPossibleMove})
+	c.cortex.SetSensors([]*ng.Sensor{sensorGameState})
 
 }
 
@@ -337,7 +331,7 @@ func (c Checkerlution) Stop() {
 
 }
 
-func (c Checkerlution) generateBestMove(board core.Board) core.Move {
+func (c *Checkerlution) generateBestMove(board core.Board) core.Move {
 	evalFunc := c.getEvaluationFunction()
 	player := cbot.GetCorePlayer(c.ourTeamId)
 	depth := 6 // TODO: crank this up higher
@@ -346,22 +340,26 @@ func (c Checkerlution) generateBestMove(board core.Board) core.Move {
 	return bestMove
 }
 
-func (c Checkerlution) getEvaluationFunction() core.EvaluationFunction {
+func (c *Checkerlution) getEvaluationFunction() core.EvaluationFunction {
 
 	evalFunc := func(currentPlayer core.Player, board core.Board) float64 {
 
-		// cortex := c.cortex
-		// player := cbot.GetCorePlayer(c.ourTeamId)
-
 		// convert the board into inputs for the neural net (32 elt vector)
 		// taking into account whether this player is "us" or not
+		gameStateVector := NewGameStateVector()
+		gameStateVector.loadFromBoard(board, currentPlayer)
 
 		// send input to the neural net
+		logg.LogTo("CHECKERLUTION", "set currentGameState %v", gameStateVector)
+		c.currentGameState = gameStateVector
+		c.cortex.SyncSensors()
+		c.cortex.SyncActuators()
 
 		// get output
+		logg.LogTo("CHECKERLUTION", "actuator output %v", c.latestActuatorOutput[0])
 
 		// return output
-		return 1.0
+		return c.latestActuatorOutput[0]
 
 	}
 	return evalFunc
