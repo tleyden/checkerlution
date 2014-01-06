@@ -336,7 +336,9 @@ func (c Checkerlution) Stop() {
 }
 
 func (c *Checkerlution) generateBestMove(board core.Board) core.Move {
-	evalFunc := c.getEvaluationFunction()
+
+	counter := 0
+	evalFunc := c.getEvaluationFunction(&counter)
 	player := cbot.GetCorePlayer(c.ourTeamId)
 
 	// with depth = 5, not working too well on first move.  when
@@ -345,13 +347,15 @@ func (c *Checkerlution) generateBestMove(board core.Board) core.Move {
 
 	depth := 4 // TODO: crank this up higher
 	bestMove, scorePostMove := board.Minimax(player, depth, evalFunc)
-	logg.LogTo("DEBUG", "scorePostMove: %v", scorePostMove)
+	logg.LogTo("DEBUG", "scorePostMove: %v.  boards eval'd: %v", scorePostMove, counter)
 	return bestMove
 }
 
-func (c *Checkerlution) getEvaluationFunction() core.EvaluationFunction {
+func (c *Checkerlution) getEvaluationFunction(counter *int) core.EvaluationFunction {
 
 	evalFunc := func(currentPlayer core.Player, board core.Board) float64 {
+
+		*counter += 1
 
 		// convert the board into inputs for the neural net (32 elt vector)
 		// taking into account whether this player is "us" or not
@@ -359,13 +363,9 @@ func (c *Checkerlution) getEvaluationFunction() core.EvaluationFunction {
 		gameStateVector.loadFromBoard(board, currentPlayer)
 
 		// send input to the neural net
-		logg.LogTo("CHECKERLUTION", "set currentGameState %v", gameStateVector)
 		c.currentGameState = gameStateVector
 		c.cortex.SyncSensors()
 		c.cortex.SyncActuators()
-
-		// get output
-		logg.LogTo("CHECKERLUTION", "actuator output %v", c.latestActuatorOutput[0])
 
 		// return output
 		return c.latestActuatorOutput[0]
