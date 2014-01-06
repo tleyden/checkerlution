@@ -192,7 +192,7 @@ func (c *Checkerlution) CreateHiddenLayer1Neurons(outputNeuron *ng.Neuron) []*ng
 	neurons := []*ng.Neuron{}
 	layerIndex := 0.25
 
-	for i := 0; i < 40; i++ {
+	for i := 0; i < 15; i++ {
 		name := fmt.Sprintf("hidden-layer-%f-n-%d", layerIndex, i)
 		neuron := &ng.Neuron{
 			ActivationFunction: ng.EncodableTanh(),
@@ -210,11 +210,6 @@ func (c *Checkerlution) CreateHiddenLayer1Neurons(outputNeuron *ng.Neuron) []*ng
 			weights := ng.RandomWeights(sensor.VectorLength)
 			neuron.ConnectInboundWeighted(sensor, weights)
 		}
-
-		// connect directly to output neuron
-		neuron.ConnectOutbound(outputNeuron)
-		weights := ng.RandomWeights(1)
-		outputNeuron.ConnectInboundWeighted(neuron, weights)
 
 		neurons = append(neurons, neuron)
 
@@ -247,7 +242,7 @@ func (c *Checkerlution) CreateHiddenLayer2Neurons(layer1Neurons []*ng.Neuron, ou
 			neuron.ConnectInboundWeighted(layer1Neuron, weights)
 		}
 
-		// connect directly to output neuron
+		// connect to output neuron
 		neuron.ConnectOutbound(outputNeuron)
 		weights := ng.RandomWeights(1)
 		outputNeuron.ConnectInboundWeighted(neuron, weights)
@@ -272,6 +267,13 @@ func (c *Checkerlution) CreateOutputNeuron() *ng.Neuron {
 	// Cannot make outbound connection, dataChan == nil [recovered]
 	// The best fix is to just load nn from json
 	neuron.Init()
+
+	// connect sensor directly to output neuron
+	for _, sensor := range c.cortex.Sensors {
+		sensor.ConnectOutbound(neuron)
+		weights := ng.RandomWeights(sensor.VectorLength)
+		neuron.ConnectInboundWeighted(sensor, weights)
+	}
 
 	return neuron
 
