@@ -24,9 +24,9 @@ func (trainer *CheckerlutionTrainer) RunPopulationTrainer() {
 
 	// create population trainer ...
 	pt := &nv.PopulationTrainer{
-		FitnessThreshold: 170,
-		MaxGenerations:   1000,
-		CortexMutator:    nv.TopologyOrWeightMutator,
+		FitnessThreshold: 1000, // set very high, will never hit it ..
+		MaxGenerations:   10,
+		CortexMutator:    nv.MutateAllWeightsBellCurve,
 		NumOpponents:     3,
 	}
 
@@ -36,9 +36,9 @@ func (trainer *CheckerlutionTrainer) RunPopulationTrainer() {
 	fitPopulation, succeeded := pt.Train(population, scape)
 
 	if succeeded {
-		logg.LogTo("MAIN", "Training succeeded")
+		logg.LogTo("MAIN", "Training finished (exceeded threshold)")
 	} else {
-		logg.LogTo("MAIN", "Training Failed")
+		logg.LogTo("MAIN", "Training finished (did not exceed threshold)")
 	}
 
 	for i, evaldCortex := range fitPopulation {
