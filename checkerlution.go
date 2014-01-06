@@ -99,30 +99,25 @@ func (c *Checkerlution) SetMode(mode OperationMode) {
 }
 
 func (c Checkerlution) calculateFitness(gameState cbot.GameState) (fitness float64) {
-	weWon := (gameState.WinningTeam == c.ourTeamId)
-	switch weWon {
-	case true:
-		logg.LogTo("CHECKERLUTION", "calculateFitness based on winning.  Turn: %v", gameState.Turn)
-		// fitness will be a positive number
-		// the least amount of moves we made, the higher the fitness
-		fitness = 200
-		fitness -= float64(gameState.Turn)
-		if fitness < 1 {
-			fitness = 1 // lowest possible fitness when winning
-		}
-	case false:
-		logg.LogTo("CHECKERLUTION", "calculateFitness based on losing.  Turn: %v", gameState.Turn)
-		// fitness will be a negative number
-		// the least amount of moves we made, the lower (more negative)
-		// the fitness, because we didn't put up much of a fight
-		fitness = -200
-		fitness += float64(gameState.Turn)
-		if fitness > -1 {
-			fitness = -1 // highest possible fitness when losing
-		}
-	}
 
+	if gameState.Turn >= 200 {
+		logg.LogTo("CHECKERLUTION", "calculateFitness detected draw.  Turn: %v", gameState.Turn)
+		fitness = 0.0
+	} else {
+
+		weWon := (gameState.WinningTeam == c.ourTeamId)
+		switch weWon {
+		case true:
+			logg.LogTo("CHECKERLUTION", "calculateFitness based on winning.  Turn: %v", gameState.Turn)
+			fitness = 1.0
+		case false:
+			logg.LogTo("CHECKERLUTION", "calculateFitness based on losing.  Turn: %v", gameState.Turn)
+			fitness = -2.0
+		}
+
+	}
 	logg.LogTo("CHECKERLUTION", "calculateFitness returning: %v", fitness)
+
 	return
 }
 
@@ -202,7 +197,6 @@ func (c *Checkerlution) CreateHiddenLayer1Neurons(outputNeuron *ng.Neuron) []*ng
 
 		// Workaround for error:
 		// Cannot make outbound connection, dataChan == nil [recovered]
-		// The best fix is to just load nn from json
 		neuron.Init()
 
 		for _, sensor := range cortex.Sensors {
@@ -233,7 +227,6 @@ func (c *Checkerlution) CreateHiddenLayer2Neurons(layer1Neurons []*ng.Neuron, ou
 
 		// Workaround for error:
 		// Cannot make outbound connection, dataChan == nil [recovered]
-		// The best fix is to just load nn from json
 		neuron.Init()
 
 		for _, layer1Neuron := range layer1Neurons {
@@ -294,7 +287,6 @@ func (c *Checkerlution) CreateActuator() *ng.Actuator {
 
 func (c *Checkerlution) actuatorFunc() ng.ActuatorFunction {
 	return func(outputs []float64) {
-		logg.LogTo("CHECKERLUTION", "actuator func called with: %v", outputs)
 		c.latestActuatorOutput = outputs
 	}
 }
@@ -316,7 +308,6 @@ func (c *Checkerlution) CreateSensors() {
 
 func (c *Checkerlution) sensorFuncGameState() ng.SensorFunction {
 	return func(syncCounter int) []float64 {
-		logg.LogTo("CHECKERLUTION", "sensor func game state called on thinker: %p, returning: %v", c, c.currentGameState)
 		if len(c.currentGameState) == 0 {
 			logg.LogPanic("sensor would return invalid gamestate")
 		}
@@ -326,7 +317,6 @@ func (c *Checkerlution) sensorFuncGameState() ng.SensorFunction {
 
 func (c *Checkerlution) sensorFuncPossibleMove() ng.SensorFunction {
 	return func(syncCounter int) []float64 {
-		logg.LogTo("CHECKERLUTION", "sensor func possible move called")
 		return c.currentPossibleMove.VectorRepresentation()
 	}
 }
