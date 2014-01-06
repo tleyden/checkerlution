@@ -6,6 +6,7 @@ import (
 	cbot "github.com/tleyden/checkers-bot"
 	core "github.com/tleyden/checkers-core"
 	ng "github.com/tleyden/neurgo"
+	"time"
 )
 
 type OperationMode int
@@ -116,7 +117,12 @@ func (c Checkerlution) calculateFitness(gameState cbot.GameState) (fitness float
 		}
 
 	}
-	logg.LogTo("CHECKERLUTION", "calculateFitness returning: %v", fitness)
+
+	uuid := c.cortex.NodeId.UUID
+	logg.LogTo("CHECKERLUTION", "fitness: %v for cortex: %v", uuid, fitness)
+	filename := fmt.Sprintf("/tmp/checkerlution-%v-%v.json", uuid, time.Now().Unix())
+	logg.LogTo("CHECKERLUTION", "Saving Cortex to %v", filename)
+	c.cortex.MarshalJSONToFile(filename)
 
 	return
 }
