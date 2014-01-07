@@ -342,6 +342,7 @@ func (c *Checkerlution) generateBestMove(board core.Board) core.Move {
 	// but with full board .. taking a long time.
 
 	depth := 4 // TODO: crank this up higher
+	logg.LogTo("DEBUG", "call Minimax")
 	bestMove, scorePostMove := board.Minimax(player, depth, evalFunc)
 	logg.LogTo("DEBUG", "scorePostMove: %v.  boards eval'd: %v", scorePostMove, counter)
 	return bestMove
@@ -360,8 +361,11 @@ func (c *Checkerlution) getEvaluationFunction(counter *int) core.EvaluationFunct
 
 		// send input to the neural net
 		c.currentGameState = gameStateVector
+		logg.LogTo("DEBUG", "call SyncSensors()")
 		c.cortex.SyncSensors()
+		logg.LogTo("DEBUG", "call SyncActuators()")
 		c.cortex.SyncActuators()
+		logg.LogTo("DEBUG", "counter: %v, going to return output: %v", *counter, c.latestActuatorOutput[0])
 
 		// return output
 		return c.latestActuatorOutput[0]
