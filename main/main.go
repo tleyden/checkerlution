@@ -14,6 +14,7 @@ func init() {
 	logg.LogKeys["DEBUG"] = true
 	logg.LogKeys["CHECKERLUTION"] = true
 	logg.LogKeys["CHECKERLUTION_SCAPE"] = true
+	logg.LogKeys["CHECKERSBOT"] = true
 	logg.LogKeys["NEURGO"] = false
 	logg.LogKeys["SENSOR_SYNC"] = false
 	logg.LogKeys["ACTUATOR_SYNC"] = false

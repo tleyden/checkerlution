@@ -50,7 +50,7 @@ func (c *Checkerlution) Think(gameState cbot.GameState) (bestMove cbot.ValidMove
 
 		// convert into core.board representation
 		board := gameState.Export()
-		logg.LogTo("DEBUG", "Before move %v", board.CompactString(true))
+		logg.LogTo("DEBUG", "Before team %v move %v", c.ourTeamId.String(), board.CompactString(true))
 
 		// generate best move (will be a core.move) -- initially, pick random
 		move := c.generateBestMove(board)
@@ -68,7 +68,7 @@ func (c *Checkerlution) Think(gameState cbot.GameState) (bestMove cbot.ValidMove
 		// this is just for debugging purposes
 		player := cbot.GetCorePlayer(c.ourTeamId)
 		boardPostMove := board.ApplyMove(player, move)
-		logg.LogTo("DEBUG", "After move %v", boardPostMove.CompactString(true))
+		logg.LogTo("DEBUG", "After team %v move %v", c.ourTeamId.String(), boardPostMove.CompactString(true))
 
 		return
 
