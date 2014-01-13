@@ -17,6 +17,8 @@ type CheckerlutionScape struct {
 
 func (scape *CheckerlutionScape) FitnessAgainst(cortex *ng.Cortex, opponentCortex *ng.Cortex) (fitness float64) {
 
+	logg.LogTo("CHECKERLUTION_SCAPE", "FitnessAgainst cortex: %v vs opponent: %v", cortex.NodeId.UUID, opponentCortex.NodeId.UUID)
+
 	if cortex == opponentCortex {
 		logg.LogPanic("Cannot calculate fitnesss between cortex %p and itself %p", cortex, opponentCortex)
 	}
