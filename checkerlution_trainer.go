@@ -30,12 +30,12 @@ func (trainer *CheckerlutionTrainer) RunPopulationTrainer() {
 		NumOpponents:     3,
 	}
 
-	population := getInitialPopulation()
+	generation := getInitialGeneration()
 	nv.RegisterHandlers(pt)
 
 	recorder := &CheckerlutionRecorder{}
 
-	fitPopulation, succeeded := pt.Train(population, scape, recorder)
+	fitGeneration, succeeded := pt.Train(generation, scape, recorder)
 
 	if succeeded {
 		logg.LogTo("MAIN", "Training finished (exceeded threshold)")
@@ -43,7 +43,7 @@ func (trainer *CheckerlutionTrainer) RunPopulationTrainer() {
 		logg.LogTo("MAIN", "Training finished (did not exceed threshold)")
 	}
 
-	for i, evaldCortex := range fitPopulation {
+	for i, evaldCortex := range fitGeneration {
 
 		logg.LogTo("MAIN", "Cortex %d fitness: %v", i, evaldCortex.Fitness)
 		filename := fmt.Sprintf("/tmp/checkerlution-%v.json", time.Now().Unix())
@@ -93,15 +93,15 @@ func (trainer *CheckerlutionTrainer) RunTopologyMutatingTrainer() {
 
 }
 
-func getInitialPopulation() (population []*ng.Cortex) {
-	population = make([]*ng.Cortex, 0)
+func getInitialGeneration() (generation []*ng.Cortex) {
+	generation = make([]*ng.Cortex, 0)
 	for i := 0; i < 10; i++ {
 
 		thinker := &Checkerlution{}
 
 		thinker.CreateNeurgoCortex()
 
-		population = append(population, thinker.Cortex())
+		generation = append(generation, thinker.Cortex())
 	}
 	return
 }
