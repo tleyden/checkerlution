@@ -45,8 +45,7 @@ func (scape *CheckerlutionScape) FitnessAgainst(cortex *ng.Cortex, opponentCorte
 	// setup checkers game for opponent
 	thinkerOpponent := &Checkerlution{}
 	thinkerOpponent.SetMode(TRAINING_MODE)
-	var opponentTeam cbot.TeamType // TODO: why can't just use := syntax here?
-	opponentTeam = cbot.RED_TEAM
+	opponentTeam := cbot.RED_TEAM
 	if scape.team == cbot.RED_TEAM {
 		opponentTeam = cbot.BLUE_TEAM
 	}
