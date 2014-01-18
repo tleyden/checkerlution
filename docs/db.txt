@@ -1,0 +1,123 @@
+
+# Overview
+
+This document contains some "thinking out loud" for building a UI that helps me see what is going on in the population monitor.  
+
+The checkerlution Go program will push the json into the sync gateway.  A native mobile android app will be used as a viewer.
+
+# UI Screens
+
+## Home screen
+
+- Population - foo
+- Population - bar
+
+## Population screen
+
+- Generation 0
+- Generation 1
+
+## Generation screen
+
+- Population
+- Name
+- State (in progress | finished)
+- Start time
+- Game in progress
+- Games played
+- Agents
+
+## Game screen (eg, game in progress)
+
+- Population
+- Generation
+- State (in progress | finished)
+- Red agent: takes you to agent screen
+- Blue agent: takes you to agent screen
+
+## Agent screen
+
+- Id
+- Population
+- Created in generation
+- Created at time
+- Cortex
+
+# Documents
+
+## Population document
+
+{
+	type: "population",
+	name: "foo",
+	max_generations: 100,
+	state: "in_progress",
+	generations: [
+		     {
+		     generation_number: 0,  
+		     start_time: "2:15"		      
+		     state: "in_progress",
+		     games: [
+		     {
+		     start_time: "2:25"		      
+		     state: "in_progress",
+		     winner: <agent_id> or null for draw (meaningless if in progress)
+		     num_moves: 85
+		     red_agent: <agent_id>,
+		     blue_agent: <agent_id>,
+		     }
+		     ],
+		     agents: [
+		     <agent_id>, <agent_id>, ..		     
+		     ]		     		     	    		     
+		     }			
+
+	]
+}
+
+## Agent document
+
+{ 
+  id: 34234-DSFS-..,
+  population: "foo",
+  created_in_generation: 0,
+  created_at_time: "2:15",
+  cortex: { .. cortex json .. }
+  
+}
+
+# DB Touchpoints
+
+## Create a new population
+
+Inputs: [population name, db url (config)]
+Actions: new empty population doc
+
+## Create a new generation
+
+Either an initial generation, or an offspring generation
+
+Inputs: [population name, agents, db url (config)]
+Actions: 
+	 - find the next available generation id
+	 - create new generation dictionary
+	 - set generation, start_time and state
+	 - set agents array to agents
+
+## Save a new completed game
+
+Inputs: [population name, generation number, game struct, db url (config)]
+Actions: 
+	 - find the appropriate generation dict based on generation number
+	 - find the games array
+	 - add game to games array
+
+Note: checkerlution_trainer will need to get called back every time a game is completed.
+
+## Loading existing population
+
+Inputs: [population name, db url (config)]
+Outputs: population from last _completed_ generation
+Actions: update document to delete the incomplete generation
+
+Eg, restart granularity is at the generation level, we can shrink this later
