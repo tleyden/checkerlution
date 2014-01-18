@@ -40,11 +40,24 @@ func train() {
 
 func run() {
 
+	LOAD_CORTEX_FROM_FILE := false
+
 	checkersBotFlags := cbot.ParseCmdLine()
 
 	thinker := &checkerlution.Checkerlution{}
 	thinker.SetMode(checkerlution.RUNNING_MODE)
-	thinker.Start(checkersBotFlags.Team) // TODO: take filename and call StartWithCortex
+
+	if LOAD_CORTEX_FROM_FILE {
+		filename := "checkerlution_trained.json"
+		cortex, err := ng.NewCortexFromJSONFile(filename)
+		if err != nil {
+			logg.LogPanic("Error reading cortex from: %v.  Err: %v", filename, err)
+		}
+		thinker.StartWithCortex(cortex, checkersBotFlags.Team)
+
+	} else {
+		thinker.Start(checkersBotFlags.Team)
+	}
 
 	game := cbot.NewGame(checkersBotFlags.Team, thinker)
 	game.SetServerUrl(checkersBotFlags.SyncGatewayUrl)
