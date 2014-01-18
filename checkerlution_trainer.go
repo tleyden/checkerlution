@@ -33,7 +33,9 @@ func (trainer *CheckerlutionTrainer) RunPopulationTrainer() {
 	population := getInitialPopulation()
 	nv.RegisterHandlers(pt)
 
-	fitPopulation, succeeded := pt.Train(population, scape)
+	recorder := &CheckerlutionRecorder{}
+
+	fitPopulation, succeeded := pt.Train(population, scape, recorder)
 
 	if succeeded {
 		logg.LogTo("MAIN", "Training finished (exceeded threshold)")
