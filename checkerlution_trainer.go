@@ -33,7 +33,8 @@ func (trainer *CheckerlutionTrainer) RunPopulationTrainer() {
 	generation := getInitialGeneration()
 	nv.RegisterHandlers(pt)
 
-	recorder := &CheckerlutionRecorder{}
+	population := Population{}
+	recorder := NewRecorder(checkersBotFlags.SyncGatewayUrl, population)
 
 	fitGeneration, succeeded := pt.Train(generation, scape, recorder)
 
