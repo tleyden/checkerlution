@@ -22,12 +22,12 @@ func NewRecorder(syncGatewayUrl string, population Population) *CheckerlutionRec
 	}
 	recorder.InitDbConnection()
 
-	newId, newRevision, err := recorder.db.InsertWith(population, population.name)
+	newId, rev, err := recorder.db.InsertWith(population, population.name)
 	if err != nil {
 		logg.LogTo("CHECKERLUTION", "Error saving population document: %v", err.Error())
 	} else {
-		logg.LogTo("CHECKERLUTION", "Saved empty population document.  Id: %v, Rev: %v, Err: %v", newId, newRevision, err)
-		recorder.population.revision = newRevision
+		logg.LogTo("CHECKERLUTION", "Saved empty population document.  Id: %v, Rev: %v, Err: %v", newId, rev, err)
+		recorder.population.rev = rev
 	}
 
 	return recorder
@@ -41,8 +41,9 @@ func (r *CheckerlutionRecorder) InitDbConnection() {
 	r.db = db
 }
 
-func (r CheckerlutionRecorder) AddGeneration(evaldCortexes []nv.EvaluatedCortex) {
+func (r *CheckerlutionRecorder) AddGeneration(evaldCortexes []nv.EvaluatedCortex) {
 
+	logg.LogTo("CHECKERLUTION", "AddGeneration called.  Rev: %v", r.population.rev)
 	agents := []Agent{}
 	for _, evaldCortex := range evaldCortexes {
 		agent := NewAgent(evaldCortex.Cortex)
@@ -51,12 +52,16 @@ func (r CheckerlutionRecorder) AddGeneration(evaldCortexes []nv.EvaluatedCortex)
 	generationNumber := r.population.NextGenerationNumber()
 	generation := NewGeneration(generationNumber, agents)
 	r.population.AddGeneration(*generation)
-	r.population.test = "foo"
-	newRevision, err := r.db.EditWith(r.population, r.population.name, r.population.revision)
+	rev, err := r.db.EditWith(
+		r.population,
+		r.population.name,
+		r.population.rev,
+	)
 	if err != nil {
 		logg.LogPanic("Error adding generation: %v", err.Error())
 	}
-	logg.LogTo("CHECKERLUTION", "Saved population document.  Rev: %v", newRevision)
+	r.population.rev = rev
+	logg.LogTo("CHECKERLUTION", "Saved population document.  Rev: %v", rev)
 
 }
 
