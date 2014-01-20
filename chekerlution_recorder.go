@@ -52,6 +52,50 @@ func (r *CheckerlutionRecorder) AddGeneration(evaldCortexes []nv.EvaluatedCortex
 	generationNumber := r.population.NextGenerationNumber()
 	generation := NewGeneration(generationNumber, agents)
 	r.population.AddGeneration(*generation)
+
+	r.Save()
+
+}
+
+func (r *CheckerlutionRecorder) AddFitnessScore(score float64, cortex *ng.Cortex, opponent *ng.Cortex) {
+
+	// find the "current" generation where this game should be added
+	generation_ptr := r.population.CurrentGeneration()
+	logg.LogTo("CHECKERLUTION", "*Generation_ptr: %v | %p", *generation_ptr, generation_ptr)
+	generation := *generation_ptr
+	logg.LogTo("CHECKERLUTION", "Generation: %v", generation)
+
+	// figure out which was winner based on score
+	winner_id := cortex.NodeId.UUID
+	if score == 0.0 {
+		winner_id = "draw"
+	} else if score < 0 {
+		winner_id = opponent.NodeId.UUID
+	}
+
+	// create new game
+	game := Game{
+		red_player_id:  cortex.NodeId.UUID,
+		blue_player_id: opponent.NodeId.UUID,
+		winner_id:      winner_id,
+	}
+
+	// add to slice of games for that generation
+	// generation.games = append(generation.games, game)
+	generation_ptr.AddGame(game)
+
+	// generation_ptr = &generation
+
+	logg.LogTo("CHECKERLUTION", "Generation.games: %v", generation.games)
+	logg.LogTo("CHECKERLUTION", "Generation: %v", generation)
+	logg.LogTo("CHECKERLUTION", "*Generation_ptr: %v | %p", *generation_ptr, generation_ptr)
+	logg.LogTo("CHECKERLUTION", "...: %v | %p", *r.population.CurrentGeneration(), r.population.CurrentGeneration())
+
+	r.Save()
+
+}
+
+func (r *CheckerlutionRecorder) Save() {
 	rev, err := r.db.EditWith(
 		r.population,
 		r.population.name,
@@ -62,9 +106,5 @@ func (r *CheckerlutionRecorder) AddGeneration(evaldCortexes []nv.EvaluatedCortex
 	}
 	r.population.rev = rev
 	logg.LogTo("CHECKERLUTION", "Saved population document.  Rev: %v", rev)
-
-}
-
-func (r CheckerlutionRecorder) AddFitnessScore(score float64, cortex *ng.Cortex, opponent *ng.Cortex) {
 
 }
