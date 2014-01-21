@@ -13,7 +13,7 @@ func init() {
 
 func TestAddGeneration(t *testing.T) {
 
-	population := Population{name: "foo31"}
+	population := Population{name: "foo35"}
 	recorder := NewRecorder("http://localhost:4984/checkers", population)
 
 	cortex := nv.BasicCortex()
