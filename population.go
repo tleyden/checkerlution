@@ -36,20 +36,26 @@ func (population Population) CurrentGeneration() *Generation {
 }
 
 type Agent struct {
-	cortex *ng.Cortex
+	cortex    *ng.Cortex
+	parent_id string
 }
 
 func (agent Agent) MarshalJSON() ([]byte, error) {
 	return json.Marshal(
 		struct {
-			Cortex *ng.Cortex
+			Cortex    *ng.Cortex
+			Parent_id string
 		}{
-			Cortex: agent.cortex,
+			Cortex:    agent.cortex,
+			Parent_id: agent.parent_id,
 		})
 }
 
-func NewAgent(cortex *ng.Cortex) *Agent {
-	return &Agent{cortex: cortex}
+func NewAgent(cortex *ng.Cortex, parent_id string) *Agent {
+	return &Agent{
+		cortex:    cortex,
+		parent_id: parent_id,
+	}
 }
 
 type Generation struct {
@@ -108,50 +114,3 @@ func (game Game) MarshalJSON() ([]byte, error) {
 			Winner_id:      game.winner_id,
 		})
 }
-
-// 	r.population.AddGeneration(generation)
-
-/*
-		agent := NewAgent(evaldCortex.Cortex)
-		agents := append(agents, agent)
-	}
-	generationNumber := r.population.NextGenerationNumber()
-	generation := NewGeneration(generationNumber, agents)
-
-*/
-
-/*
-type Population struct {
-	name        string
-	generations []Generation
-}
-
-func NewPopulation(name string, generation Generation) *Population {
-	return &Population{
-		name:        name,
-		generations: []Generation{generation},
-	}
-}
-
-type Generation struct {
-	start_time string
-	number     int
-	state      string
-	agents     []Agent
-}
-
-func NewGeneration(generation []*ng.Cortex) *Generation {
-	generation := &Generation{
-		number: 0, // TODO: fix this
-
-	}
-}
-
-type Agent struct {
-	cortex *ng.Cortex
-}
-
-func NewAgent(cortex *ng.Cortex) *Agent {
-
-}
-*/
