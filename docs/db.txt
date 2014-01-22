@@ -78,8 +78,7 @@ The checkerlution Go program will push the json into the sync gateway.  A native
 ## Agent document
 
 { 
-  id: 34234-DSFS-..,
-  population: "foo",
+  parent_id: 34234-DSFS-..,
   created_in_generation: 0,
   created_at_time: "2:15",
   cortex: { .. cortex json .. }
