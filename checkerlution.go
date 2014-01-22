@@ -101,21 +101,16 @@ func (c *Checkerlution) SetMode(mode OperationMode) {
 
 func (c Checkerlution) calculateFitness(gameState cbot.GameState) (fitness float64) {
 
-	if gameState.Turn >= 200 {
-		logg.LogTo("CHECKERLUTION", "calculateFitness detected draw.  Turn: %v", gameState.Turn)
+	switch gameState.WinningTeam {
+	case c.ourTeamId:
+		logg.LogTo("CHECKERLUTION", "calculateFitness based on winning.  Turn: %v", gameState.Turn)
+		fitness = 1.0
+	case c.ourTeamId.Opponent():
+		logg.LogTo("CHECKERLUTION", "calculateFitness based on losing.  Turn: %v", gameState.Turn)
+		fitness = -2.0
+	default:
+		logg.LogTo("CHECKERLUTION", "calculateFitness based on draw.  Turn: %v", gameState.Turn)
 		fitness = 0.0
-	} else {
-
-		weWon := (gameState.WinningTeam == c.ourTeamId)
-		switch weWon {
-		case true:
-			logg.LogTo("CHECKERLUTION", "calculateFitness based on winning.  Turn: %v", gameState.Turn)
-			fitness = 1.0
-		case false:
-			logg.LogTo("CHECKERLUTION", "calculateFitness based on losing.  Turn: %v", gameState.Turn)
-			fitness = -2.0
-		}
-
 	}
 
 	uuid := c.cortex.NodeId.UUID
