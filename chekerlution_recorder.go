@@ -46,7 +46,8 @@ func (r *CheckerlutionRecorder) AddGeneration(evaldCortexes []nv.EvaluatedCortex
 	logg.LogTo("CHECKERLUTION", "AddGeneration called.  Rev: %v", r.population.rev)
 	agents := []Agent{}
 	for _, evaldCortex := range evaldCortexes {
-		agent := NewAgent(evaldCortex.Cortex)
+		parent_id := evaldCortex.Cortex.NodeId.UUID
+		agent := NewAgent(evaldCortex.Cortex, parent_id)
 		agents = append(agents, *agent)
 	}
 	generationNumber := r.population.NextGenerationNumber()
