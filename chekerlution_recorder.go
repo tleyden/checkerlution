@@ -47,6 +47,7 @@ func (r *CheckerlutionRecorder) AddGeneration(evaldCortexes []nv.EvaluatedCortex
 	agents := []Agent{}
 	for _, evaldCortex := range evaldCortexes {
 		parent_id := evaldCortex.Cortex.NodeId.UUID
+		r.SaveCortex(evaldCortex.Cortex)
 		agent := NewAgent(evaldCortex.Cortex, parent_id)
 		agents = append(agents, *agent)
 	}
@@ -86,7 +87,19 @@ func (r *CheckerlutionRecorder) AddFitnessScore(score float64, cortex *ng.Cortex
 
 }
 
+func (r *CheckerlutionRecorder) SaveCortex(cortex *ng.Cortex) {
+
+	newId, rev, err := r.db.InsertWith(cortex, cortex.NodeId.UUID)
+	if err != nil {
+		logg.LogTo("CHECKERLUTION", "Error saving cortex: %v, already exists?", err.Error())
+	} else {
+		logg.LogTo("CHECKERLUTION", "Saved cortex.  Id: %v, Rev: %v, Err: %v", newId, rev, err)
+	}
+
+}
+
 func (r *CheckerlutionRecorder) Save() {
+
 	rev, err := r.db.EditWith(
 		r.population,
 		r.population.name,

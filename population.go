@@ -36,24 +36,24 @@ func (population Population) CurrentGeneration() *Generation {
 }
 
 type Agent struct {
-	cortex    *ng.Cortex
+	cortex_id string
 	parent_id string
 }
 
 func (agent Agent) MarshalJSON() ([]byte, error) {
 	return json.Marshal(
 		struct {
-			Cortex    *ng.Cortex
+			Cortex_id string
 			Parent_id string
 		}{
-			Cortex:    agent.cortex,
+			Cortex_id: agent.cortex_id,
 			Parent_id: agent.parent_id,
 		})
 }
 
 func NewAgent(cortex *ng.Cortex, parent_id string) *Agent {
 	return &Agent{
-		cortex:    cortex,
+		cortex_id: cortex.NodeId.UUID,
 		parent_id: parent_id,
 	}
 }
