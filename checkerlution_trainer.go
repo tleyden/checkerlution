@@ -12,10 +12,9 @@ import (
 
 type CheckerlutionTrainer struct{}
 
-func (trainer *CheckerlutionTrainer) RunPopulationTrainer() {
+func (trainer *CheckerlutionTrainer) RunPopulationTrainer(checkersBotFlags cbot.CheckersBotFlags) {
 
 	// setup the scape
-	checkersBotFlags := cbot.ParseCmdLine()
 	scape := &CheckerlutionScape{}
 	scape.SetSyncGatewayUrl(checkersBotFlags.SyncGatewayUrl)
 	scape.SetFeedType(checkersBotFlags.FeedType)
@@ -33,7 +32,7 @@ func (trainer *CheckerlutionTrainer) RunPopulationTrainer() {
 	generation := getInitialGeneration()
 	nv.RegisterHandlers(pt)
 
-	population := Population{name: "population25"}
+	population := Population{name: "population26"}
 	recorder := NewRecorder(checkersBotFlags.SyncGatewayUrl, population)
 
 	fitGeneration, succeeded := pt.Train(generation, scape, recorder)
@@ -52,10 +51,9 @@ func (trainer *CheckerlutionTrainer) RunPopulationTrainer() {
 
 }
 
-func (trainer *CheckerlutionTrainer) RunTopologyMutatingTrainer() {
+func (trainer *CheckerlutionTrainer) RunTopologyMutatingTrainer(checkersBotFlags cbot.CheckersBotFlags) {
 
 	// setup the scape
-	checkersBotFlags := cbot.ParseCmdLine()
 	scape := &CheckerlutionScape{}
 	scape.SetSyncGatewayUrl(checkersBotFlags.SyncGatewayUrl)
 	scape.SetFeedType(checkersBotFlags.FeedType)

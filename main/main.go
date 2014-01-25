@@ -2,6 +2,7 @@ package main
 
 import (
 	_ "expvar"
+	"flag"
 	"github.com/couchbaselabs/logg"
 	"github.com/tleyden/checkerlution"
 	cbot "github.com/tleyden/checkers-bot"
@@ -26,7 +27,7 @@ func init() {
 	ng.SeedRandom()
 }
 
-func train() {
+func train(checkersBotFlags cbot.CheckersBotFlags) {
 
 	// run a webserver in order to view expvar output
 	// at http://localhost:8080/debug/vars
@@ -35,15 +36,13 @@ func train() {
 	trainer := &checkerlution.CheckerlutionTrainer{}
 
 	// checkerlution.RunTopologyMutatingTrainer()
-	trainer.RunPopulationTrainer()
+	trainer.RunPopulationTrainer(checkersBotFlags)
 
 }
 
-func run() {
+func run(checkersBotFlags cbot.CheckersBotFlags) {
 
 	LOAD_CORTEX_FROM_FILE := false
-
-	checkersBotFlags := cbot.ParseCmdLine()
 
 	thinker := &checkerlution.Checkerlution{}
 	thinker.SetMode(checkerlution.RUNNING_MODE)
@@ -72,11 +71,31 @@ func run() {
 }
 
 func main() {
-	MODE := 1
-	if MODE == 0 {
-		run()
+
+	checkersBotRawFlags := cbot.GetCheckersBotRawFlags()
+
+	var mode int
+
+	flag.IntVar(
+		&mode,
+		"mode",
+		0,
+		"Run Mode - Run: 0 Train: 1",
+	)
+
+	flag.Parse()
+
+	checkersBotFlags := checkersBotRawFlags.GetCheckersBotFlags()
+
+	logg.LogTo("CHECKERLUTION", "Flags: %v", checkersBotFlags)
+	logg.LogTo("CHECKERLUTION", "Mode: %v", mode)
+
+	if mode == 0 {
+		logg.LogTo("CHECKERLUTION", "Run mode: Run")
+		run(checkersBotFlags)
 	} else {
-		train()
+		logg.LogTo("CHECKERLUTION", "Run mode: Train")
+		train(checkersBotFlags)
 	}
 
 }
