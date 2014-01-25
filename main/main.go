@@ -3,9 +3,11 @@ package main
 import (
 	_ "expvar"
 	"flag"
+	"fmt"
 	"github.com/couchbaselabs/logg"
 	"github.com/tleyden/checkerlution"
 	cbot "github.com/tleyden/checkers-bot"
+	"github.com/tleyden/go-couch"
 	ng "github.com/tleyden/neurgo"
 	"net/http"
 )
@@ -40,22 +42,41 @@ func train(checkersBotFlags cbot.CheckersBotFlags) {
 
 }
 
-func run(checkersBotFlags cbot.CheckersBotFlags) {
-
-	LOAD_CORTEX_FROM_FILE := false
+func run(checkersBotFlags cbot.CheckersBotFlags, cortexId string) {
 
 	thinker := &checkerlution.Checkerlution{}
 	thinker.SetMode(checkerlution.RUNNING_MODE)
 
-	if LOAD_CORTEX_FROM_FILE {
-		filename := "checkerlution_trained.json"
+	if len(cortexId) > 0 {
+		// first try to load it from a file with that id
+		filename := fmt.Sprintf("%v.json", cortexId)
 		cortex, err := ng.NewCortexFromJSONFile(filename)
-		if err != nil {
-			logg.LogPanic("Error reading cortex from: %v.  Err: %v", filename, err)
+		if err == nil {
+			thinker.StartWithCortex(cortex, checkersBotFlags.Team)
+
+		} else {
+			// otherwise, load it from db
+			db, error := couch.Connect(checkersBotFlags.SyncGatewayUrl)
+			if error != nil {
+				logg.LogPanic("Error connecting to %v: %v", checkersBotFlags.SyncGatewayUrl, error)
+			}
+
+			cortex := &ng.Cortex{}
+
+			error = db.Retrieve(cortexId, cortex)
+			logg.LogTo("CHECKERLUTION", "error: %v cortex :%v", error, *cortex)
+
+			if error != nil {
+				logg.LogPanic("Could not find cortex: %v", cortexId, error)
+			}
+
+			cortex.LinkNodesToCortex()
+			thinker.StartWithCortex(cortex, checkersBotFlags.Team)
+
 		}
-		thinker.StartWithCortex(cortex, checkersBotFlags.Team)
 
 	} else {
+		// start with a random cortex
 		thinker.Start(checkersBotFlags.Team)
 	}
 
@@ -83,16 +104,26 @@ func main() {
 		"Run Mode - Run: 0 Train: 1",
 	)
 
+	var cortexId string
+
+	flag.StringVar(
+		&cortexId,
+		"cortexId",
+		"",
+		"Cortex Id of saved cortex",
+	)
+
 	flag.Parse()
 
 	checkersBotFlags := checkersBotRawFlags.GetCheckersBotFlags()
 
 	logg.LogTo("CHECKERLUTION", "Flags: %v", checkersBotFlags)
 	logg.LogTo("CHECKERLUTION", "Mode: %v", mode)
+	logg.LogTo("CHECKERLUTION", "CortexId: %v", cortexId)
 
 	if mode == 0 {
 		logg.LogTo("CHECKERLUTION", "Run mode: Run")
-		run(checkersBotFlags)
+		run(checkersBotFlags, cortexId)
 	} else {
 		logg.LogTo("CHECKERLUTION", "Run mode: Train")
 		train(checkersBotFlags)
