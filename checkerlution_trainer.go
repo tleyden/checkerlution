@@ -33,7 +33,7 @@ func (trainer *CheckerlutionTrainer) RunPopulationTrainer() {
 	generation := getInitialGeneration()
 	nv.RegisterHandlers(pt)
 
-	population := Population{name: "population11"}
+	population := Population{name: "population25"}
 	recorder := NewRecorder(checkersBotFlags.SyncGatewayUrl, population)
 
 	fitGeneration, succeeded := pt.Train(generation, scape, recorder)
@@ -47,10 +47,6 @@ func (trainer *CheckerlutionTrainer) RunPopulationTrainer() {
 	for i, evaldCortex := range fitGeneration {
 
 		logg.LogTo("MAIN", "Cortex %d fitness: %v", i, evaldCortex.Fitness)
-		filename := fmt.Sprintf("/tmp/checkerlution-%v.json", time.Now().Unix())
-		logg.LogTo("MAIN", "Saving Cortex to %v", filename)
-		cortex := evaldCortex.Cortex
-		cortex.MarshalJSONToFile(filename)
 
 	}
 

@@ -113,12 +113,6 @@ func (c Checkerlution) calculateFitness(gameState cbot.GameState) (fitness float
 		fitness = 0.0
 	}
 
-	uuid := c.cortex.NodeId.UUID
-	logg.LogTo("CHECKERLUTION", "fitness: %v for cortex: %v", uuid, fitness)
-	filename := fmt.Sprintf("/tmp/checkerlution-%v-%v.json", uuid, time.Now().Unix())
-	logg.LogTo("CHECKERLUTION", "Saving Cortex to %v", filename)
-	c.cortex.MarshalJSONToFile(filename)
-
 	return
 }
 
@@ -155,8 +149,6 @@ func (c *Checkerlution) CreateNeurgoCortex() {
 
 	outputNeuron.ConnectOutbound(actuator)
 	actuator.ConnectInbound(outputNeuron)
-
-	c.cortex.MarshalJSONToFile("checkerlution_cortex.json")
 
 }
 
