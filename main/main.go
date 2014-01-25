@@ -16,6 +16,7 @@ func init() {
 	logg.LogKeys["CHECKERLUTION_SCAPE"] = true
 	logg.LogKeys["CHECKERSBOT"] = true
 	logg.LogKeys["NEURGO"] = false
+	logg.LogKeys["NEURVOLVE"] = true
 	logg.LogKeys["SENSOR_SYNC"] = false
 	logg.LogKeys["ACTUATOR_SYNC"] = false
 	logg.LogKeys["NODE_PRE_SEND"] = false
