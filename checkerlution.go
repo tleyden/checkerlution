@@ -6,7 +6,6 @@ import (
 	cbot "github.com/tleyden/checkers-bot"
 	core "github.com/tleyden/checkers-core"
 	ng "github.com/tleyden/neurgo"
-	"time"
 )
 
 type OperationMode int
