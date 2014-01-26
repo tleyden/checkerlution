@@ -2,16 +2,24 @@ package checkerlution
 
 import (
 	"encoding/json"
+	"github.com/couchbaselabs/logg"
 	ng "github.com/tleyden/neurgo"
 )
 
 type Population struct {
 	name        string
-	rev         string
+	rev         string `json:"_rev"`
 	generations []Generation
 }
 
+type PopulationJson struct {
+	Name        string
+	Rev         string `json:"_rev"`
+	Generations []Generation
+}
+
 func (population Population) MarshalJSON() ([]byte, error) {
+
 	return json.Marshal(
 		struct {
 			Name        string
@@ -20,6 +28,20 @@ func (population Population) MarshalJSON() ([]byte, error) {
 			Name:        population.name,
 			Generations: population.generations,
 		})
+}
+
+func (population *Population) UnmarshalJSON(data []byte) error {
+
+	logg.LogTo("CHECKERLUTION", "")
+	populationJson := &PopulationJson{}
+	error := json.Unmarshal(data, populationJson)
+	if error == nil {
+		population.name = populationJson.Name
+		population.rev = populationJson.Rev
+		population.generations = populationJson.Generations
+	}
+	return error
+
 }
 
 func (population Population) NextGenerationNumber() int {
