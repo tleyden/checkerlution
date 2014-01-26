@@ -29,12 +29,28 @@ func (trainer *CheckerlutionTrainer) RunPopulationTrainer(checkersBotFlags cbot.
 		NumOpponents:     3,
 	}
 
-	generation := getInitialGeneration()
 	nv.RegisterHandlers(pt)
 
-	recorder := NewRecorder(checkersBotFlags.SyncGatewayUrl, "population28")
+	recorder := NewRecorder(checkersBotFlags.SyncGatewayUrl, "population31")
 
-	fitGeneration, succeeded := pt.Train(generation, scape, recorder)
+	cortexes := []*ng.Cortex{}
+	if len(recorder.GetLatestGenerationCortexes()) > 0 {
+		cortexes = recorder.GetLatestGenerationCortexes()
+		if len(cortexes) == 0 {
+			logg.LogPanic("No cortexes found in latest generation")
+		}
+		logg.LogTo("CHECKERLUTION", "Starting from existing generation")
+
+	} else {
+		cortexes = getInitialGeneration()
+		logg.LogTo("CHECKERLUTION", "Starting from new")
+	}
+
+	for _, cortex := range cortexes {
+		logg.LogTo("CHECKERLUTION", "Cortex: %v", cortex.NodeId.UUID)
+	}
+
+	fitGeneration, succeeded := pt.Train(cortexes, scape, recorder)
 
 	if succeeded {
 		logg.LogTo("MAIN", "Training finished (exceeded threshold)")

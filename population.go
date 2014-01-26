@@ -178,7 +178,7 @@ func (game *Game) UnmarshalJSON(data []byte) error {
 	if error == nil {
 		game.red_player_id = gameJson.Red_player_id
 		game.blue_player_id = gameJson.Blue_player_id
-		game.Winner_id = gameJson.Winner_id
+		game.winner_id = gameJson.Winner_id
 	}
 	return error
 

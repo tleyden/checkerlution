@@ -38,12 +38,14 @@ func (r *CheckerlutionRecorder) createOrRetrievePopulation(populationName string
 		// if does not exist, create new one
 		logg.LogTo("CHECKERLUTION", "Could not find: %v", populationName, error)
 
+		population.name = populationName
 		newId, rev, err := r.db.InsertWith(population, populationName)
 		if err != nil {
-			logg.LogTo("CHECKERLUTION", "Error saving population document: %v", err.Error())
+			logg.LogPanic("Error saving population document: %v", err.Error())
 		} else {
 			logg.LogTo("CHECKERLUTION", "Saved empty population document.  Id: %v, Rev: %v, Err: %v", newId, rev, err)
 			population.rev = rev
+
 		}
 
 	} else {
@@ -53,6 +55,21 @@ func (r *CheckerlutionRecorder) createOrRetrievePopulation(populationName string
 	}
 
 	r.population = *population
+
+}
+
+func (r CheckerlutionRecorder) GetLatestGenerationCortexes() []*ng.Cortex {
+	latestGeneration := Generation{}
+	for _, generation := range r.population.generations {
+		latestGeneration = generation
+	}
+
+	cortexes := []*ng.Cortex{}
+	for _, agent := range latestGeneration.agents {
+		cortex := LoadCortex(agent.cortex_id, r.db)
+		cortexes = append(cortexes, cortex)
+	}
+	return cortexes
 
 }
 
@@ -137,4 +154,14 @@ func (r *CheckerlutionRecorder) Save() {
 	r.population.rev = rev
 	logg.LogTo("CHECKERLUTION", "Saved population document.  Rev: %v", rev)
 
+}
+
+func LoadCortex(cortexId string, db couch.Database) *ng.Cortex {
+	cortex := &ng.Cortex{}
+	error := db.Retrieve(cortexId, cortex)
+	if error != nil {
+		logg.LogPanic("Could not find cortex: %v", cortexId, error)
+	}
+	cortex.LinkNodesToCortex()
+	return cortex
 }
