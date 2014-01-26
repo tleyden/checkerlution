@@ -24,9 +24,9 @@ func (trainer *CheckerlutionTrainer) RunPopulationTrainer(checkersBotFlags cbot.
 	// create population trainer ...
 	pt := &nv.PopulationTrainer{
 		FitnessThreshold: 1000, // set very high, will never hit it ..
-		MaxGenerations:   10,
+		MaxGenerations:   25,
 		CortexMutator:    nv.MutateAllWeightsBellCurve,
-		NumOpponents:     3,
+		NumOpponents:     5,
 	}
 
 	nv.RegisterHandlers(pt)
