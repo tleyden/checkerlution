@@ -31,7 +31,7 @@ func (trainer *CheckerlutionTrainer) RunPopulationTrainer(checkersBotFlags cbot.
 
 	nv.RegisterHandlers(pt)
 
-	recorder := NewRecorder(checkersBotFlags.SyncGatewayUrl, "population31")
+	recorder := NewRecorder(checkersBotFlags.SyncGatewayUrl, "population12")
 
 	cortexes := []*ng.Cortex{}
 	if len(recorder.GetLatestGenerationCortexes()) > 0 {
