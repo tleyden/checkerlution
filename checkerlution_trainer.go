@@ -12,7 +12,9 @@ import (
 
 type CheckerlutionTrainer struct{}
 
-func (trainer *CheckerlutionTrainer) RunPopulationTrainer(checkersBotFlags cbot.CheckersBotFlags) {
+func (trainer *CheckerlutionTrainer) RunPopulationTrainer(checkerlutionFlags CheckerlutionFlags) {
+
+	checkersBotFlags := checkerlutionFlags.CheckersBotFlags
 
 	// setup the scape
 	scape := &CheckerlutionScape{}
@@ -31,7 +33,10 @@ func (trainer *CheckerlutionTrainer) RunPopulationTrainer(checkersBotFlags cbot.
 
 	nv.RegisterHandlers(pt)
 
-	recorder := NewRecorder(checkersBotFlags.SyncGatewayUrl, "population12")
+	recorder := NewRecorder(
+		checkersBotFlags.SyncGatewayUrl,
+		checkerlutionFlags.PopulationName,
+	)
 
 	cortexes := []*ng.Cortex{}
 	if len(recorder.GetLatestGenerationCortexes()) > 0 {

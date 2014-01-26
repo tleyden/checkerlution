@@ -25,6 +25,11 @@ type Checkerlution struct {
 	latestFitnessScore   float64
 }
 
+type CheckerlutionFlags struct {
+	CheckersBotFlags cbot.CheckersBotFlags
+	PopulationName   string
+}
+
 func (c *Checkerlution) Start(ourTeamId cbot.TeamType) {
 	c.ourTeamId = ourTeamId
 	c.CreateNeurgoCortex()

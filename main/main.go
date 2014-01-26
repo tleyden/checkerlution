@@ -29,7 +29,7 @@ func init() {
 	ng.SeedRandom()
 }
 
-func train(checkersBotFlags cbot.CheckersBotFlags) {
+func train(checkerlutionFlags checkerlution.CheckerlutionFlags) {
 
 	// run a webserver in order to view expvar output
 	// at http://localhost:8080/debug/vars
@@ -38,7 +38,7 @@ func train(checkersBotFlags cbot.CheckersBotFlags) {
 	trainer := &checkerlution.CheckerlutionTrainer{}
 
 	// checkerlution.RunTopologyMutatingTrainer()
-	trainer.RunPopulationTrainer(checkersBotFlags)
+	trainer.RunPopulationTrainer(checkerlutionFlags)
 
 }
 
@@ -95,6 +95,7 @@ func main() {
 
 	checkersBotRawFlags := cbot.GetCheckersBotRawFlags()
 
+	// TODO: make this a friendly string instead of an int
 	var mode int
 
 	flag.IntVar(
@@ -116,6 +117,10 @@ func main() {
 	flag.Parse()
 
 	checkersBotFlags := checkersBotRawFlags.GetCheckersBotFlags()
+	checkerlutionFlags := checkerlution.CheckerlutionFlags{
+		CheckersBotFlags: checkersBotFlags,
+		PopulationName:   "population34",
+	}
 
 	logg.LogTo("CHECKERLUTION", "Flags: %v", checkersBotFlags)
 	logg.LogTo("CHECKERLUTION", "Mode: %v", mode)
@@ -126,7 +131,7 @@ func main() {
 		run(checkersBotFlags, cortexId)
 	} else {
 		logg.LogTo("CHECKERLUTION", "Run mode: Train")
-		train(checkersBotFlags)
+		train(checkerlutionFlags)
 	}
 
 }
