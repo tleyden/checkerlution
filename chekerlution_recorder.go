@@ -15,22 +15,45 @@ type CheckerlutionRecorder struct {
 
 // This assumes the population does not already exist in the database
 // and so it will create it
-func NewRecorder(syncGatewayUrl string, population Population) *CheckerlutionRecorder {
+func NewRecorder(syncGatewayUrl string, populationName string) *CheckerlutionRecorder {
 	recorder := &CheckerlutionRecorder{
 		syncGatewayUrl: syncGatewayUrl,
-		population:     population,
 	}
 	recorder.InitDbConnection()
 
-	newId, rev, err := recorder.db.InsertWith(population, population.name)
-	if err != nil {
-		logg.LogTo("CHECKERLUTION", "Error saving population document: %v", err.Error())
-	} else {
-		logg.LogTo("CHECKERLUTION", "Saved empty population document.  Id: %v, Rev: %v, Err: %v", newId, rev, err)
-		recorder.population.rev = rev
-	}
+	recorder.createOrRetrievePopulation(populationName)
 
 	return recorder
+}
+
+func (r *CheckerlutionRecorder) createOrRetrievePopulation(populationName string) {
+
+	population := &Population{}
+
+	// try to fetch existing population
+	logg.LogTo("CHECKERLUTION", "Looking up: %v", populationName)
+	error := r.db.Retrieve(populationName, population)
+
+	if error != nil {
+		// if does not exist, create new one
+		logg.LogTo("CHECKERLUTION", "Could not find: %v", populationName, error)
+
+		newId, rev, err := r.db.InsertWith(population, populationName)
+		if err != nil {
+			logg.LogTo("CHECKERLUTION", "Error saving population document: %v", err.Error())
+		} else {
+			logg.LogTo("CHECKERLUTION", "Saved empty population document.  Id: %v, Rev: %v, Err: %v", newId, rev, err)
+			population.rev = rev
+		}
+
+	} else {
+		logg.LogTo("CHECKERLUTION", "Found: %v", *population)
+		logg.LogTo("CHECKERLUTION", "Rev: %v", (*population).rev)
+
+	}
+
+	r.population = *population
+
 }
 
 func (r *CheckerlutionRecorder) InitDbConnection() {
