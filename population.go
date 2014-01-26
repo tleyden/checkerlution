@@ -19,12 +19,8 @@ type PopulationJson struct {
 }
 
 func (population Population) MarshalJSON() ([]byte, error) {
-
 	return json.Marshal(
-		struct {
-			Name        string
-			Generations []Generation
-		}{
+		&PopulationJson{
 			Name:        population.name,
 			Generations: population.generations,
 		})
