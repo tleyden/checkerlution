@@ -114,13 +114,18 @@ func main() {
 		"Cortex Id of saved cortex",
 	)
 
+	checkerlutionFlags := checkerlution.CheckerlutionFlags{}
+	flag.StringVar(
+		&checkerlutionFlags.PopulationName,
+		"populationName",
+		"",
+		"Population name, eg, population1",
+	)
+
 	flag.Parse()
 
 	checkersBotFlags := checkersBotRawFlags.GetCheckersBotFlags()
-	checkerlutionFlags := checkerlution.CheckerlutionFlags{
-		CheckersBotFlags: checkersBotFlags,
-		PopulationName:   "population34",
-	}
+	checkerlutionFlags.CheckersBotFlags = checkersBotFlags
 
 	logg.LogTo("CHECKERLUTION", "Flags: %v", checkersBotFlags)
 	logg.LogTo("CHECKERLUTION", "Mode: %v", mode)
@@ -131,6 +136,10 @@ func main() {
 		run(checkersBotFlags, cortexId)
 	} else {
 		logg.LogTo("CHECKERLUTION", "Run mode: Train")
+		if len(checkerlutionFlags.PopulationName) == 0 {
+			logg.LogPanic("populationName required in training mode")
+		}
+
 		train(checkerlutionFlags)
 	}
 
