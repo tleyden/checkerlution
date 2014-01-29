@@ -110,7 +110,7 @@ func (trainer *CheckerlutionTrainer) RunTopologyMutatingTrainer(checkersBotFlags
 
 func getInitialGeneration() (generation []*ng.Cortex) {
 	generation = make([]*ng.Cortex, 0)
-	for i := 0; i < 10; i++ {
+	for i := 0; i < 30; i++ {
 
 		thinker := &Checkerlution{}
 
