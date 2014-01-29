@@ -184,7 +184,7 @@ func (c *Checkerlution) CreateHiddenLayer1Neurons(outputNeuron *ng.Neuron) []*ng
 	neurons := []*ng.Neuron{}
 	layerIndex := 0.25
 
-	for i := 0; i < 15; i++ {
+	for i := 0; i < 40; i++ {
 		name := fmt.Sprintf("hidden-layer-%f-n-%d", layerIndex, i)
 		neuron := &ng.Neuron{
 			ActivationFunction: ng.EncodableTanh(),
