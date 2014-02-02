@@ -9,7 +9,9 @@ import (
 	cbot "github.com/tleyden/checkers-bot"
 	"github.com/tleyden/go-couch"
 	ng "github.com/tleyden/neurgo"
+	"io/ioutil"
 	"net/http"
+	"strings"
 )
 
 func init() {
@@ -44,7 +46,33 @@ func train(checkerlutionFlags checkerlution.CheckerlutionFlags) {
 
 func loadCortex(checkersBotFlags cbot.CheckersBotFlags, cortexId string) *ng.Cortex {
 
-	if len(cortexId) > 0 {
+	if len(cortexId) <= 0 {
+		return nil
+	}
+
+	if strings.HasPrefix(cortexId, "http") {
+		res, err := http.Get(cortexId)
+		if err != nil {
+			logg.LogPanic("Error connecting to %v", cortexId, err)
+			return nil
+		}
+		defer res.Body.Close()
+		responseBody, err := ioutil.ReadAll(res.Body)
+		if err != nil {
+			logg.LogPanic("Error connecting to %v", cortexId, err)
+			return nil
+		}
+		cortex, err := ng.NewCortexFromJSONSBytes(responseBody)
+		if err == nil {
+			return cortex
+
+		} else {
+			logg.LogPanic("Error loading cortex: %v", cortexId)
+			return nil
+		}
+
+	} else {
+
 		// first try to load it from a file with that id
 		filename := fmt.Sprintf("%v.json", cortexId)
 		cortex, err := ng.NewCortexFromJSONFile(filename)
@@ -72,8 +100,7 @@ func loadCortex(checkersBotFlags cbot.CheckersBotFlags, cortexId string) *ng.Cor
 			cortex.LinkNodesToCortex()
 			return cortex
 		}
-	} else {
-		return nil
+
 	}
 
 }
