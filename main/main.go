@@ -42,23 +42,21 @@ func train(checkerlutionFlags checkerlution.CheckerlutionFlags) {
 
 }
 
-func run(checkersBotFlags cbot.CheckersBotFlags, cortexId string) {
-
-	thinker := &checkerlution.Checkerlution{}
-	thinker.SetMode(checkerlution.RUNNING_MODE)
+func loadCortex(checkersBotFlags cbot.CheckersBotFlags, cortexId string) *ng.Cortex {
 
 	if len(cortexId) > 0 {
 		// first try to load it from a file with that id
 		filename := fmt.Sprintf("%v.json", cortexId)
 		cortex, err := ng.NewCortexFromJSONFile(filename)
 		if err == nil {
-			thinker.StartWithCortex(cortex, checkersBotFlags.Team)
+			return cortex
 
 		} else {
 			// otherwise, load it from db
 			db, error := couch.Connect(checkersBotFlags.SyncGatewayUrl)
 			if error != nil {
 				logg.LogPanic("Error connecting to %v: %v", checkersBotFlags.SyncGatewayUrl, error)
+				return nil
 			}
 
 			cortex := &ng.Cortex{}
@@ -68,13 +66,26 @@ func run(checkersBotFlags cbot.CheckersBotFlags, cortexId string) {
 
 			if error != nil {
 				logg.LogPanic("Could not find cortex: %v", cortexId, error)
+				return nil
 			}
 
 			cortex.LinkNodesToCortex()
-			thinker.StartWithCortex(cortex, checkersBotFlags.Team)
-
+			return cortex
 		}
+	} else {
+		return nil
+	}
 
+}
+
+func run(checkersBotFlags cbot.CheckersBotFlags, cortexId string) {
+
+	thinker := &checkerlution.Checkerlution{}
+	thinker.SetMode(checkerlution.RUNNING_MODE)
+	cortex := loadCortex(checkersBotFlags, cortexId)
+
+	if cortex != nil {
+		thinker.StartWithCortex(cortex, checkersBotFlags.Team)
 	} else {
 		// start with a random cortex
 		thinker.Start(checkersBotFlags.Team)
