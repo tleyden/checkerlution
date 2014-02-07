@@ -189,7 +189,7 @@ func (c *Checkerlution) CreateHiddenLayer1Neurons(outputNeuron *ng.Neuron) []*ng
 		neuron := &ng.Neuron{
 			ActivationFunction: ng.EncodableTanh(),
 			NodeId:             ng.NewNeuronId(name, layerIndex),
-			Bias:               0.0,
+			Bias:               ng.RandomBias(),
 		}
 
 		// Workaround for error:
@@ -198,7 +198,7 @@ func (c *Checkerlution) CreateHiddenLayer1Neurons(outputNeuron *ng.Neuron) []*ng
 
 		for _, sensor := range cortex.Sensors {
 			sensor.ConnectOutbound(neuron)
-			weights := ng.FixedWeights(sensor.VectorLength, 0.0)
+			weights := ng.RandomWeights(sensor.VectorLength)
 			neuron.ConnectInboundWeighted(sensor, weights)
 		}
 
@@ -219,7 +219,7 @@ func (c *Checkerlution) CreateHiddenLayer2Neurons(layer1Neurons []*ng.Neuron, ou
 		neuron := &ng.Neuron{
 			ActivationFunction: ng.EncodableTanh(),
 			NodeId:             ng.NewNeuronId(name, layerIndex),
-			Bias:               0.0,
+			Bias:               ng.RandomBias(),
 		}
 
 		// Workaround for error:
@@ -228,13 +228,13 @@ func (c *Checkerlution) CreateHiddenLayer2Neurons(layer1Neurons []*ng.Neuron, ou
 
 		for _, layer1Neuron := range layer1Neurons {
 			layer1Neuron.ConnectOutbound(neuron)
-			weights := ng.FixedWeights(1, 0.0)
+			weights := ng.RandomWeights(1)
 			neuron.ConnectInboundWeighted(layer1Neuron, weights)
 		}
 
 		// connect to output neuron
 		neuron.ConnectOutbound(outputNeuron)
-		weights := ng.FixedWeights(1, 0.0)
+		weights := ng.RandomWeights(1)
 		outputNeuron.ConnectInboundWeighted(neuron, weights)
 
 		neurons = append(neurons, neuron)
@@ -250,7 +250,7 @@ func (c *Checkerlution) CreateOutputNeuron() *ng.Neuron {
 	neuron := &ng.Neuron{
 		ActivationFunction: ng.EncodableTanh(),
 		NodeId:             ng.NewNeuronId("OutputNeuron", layerIndex),
-		Bias:               0.0,
+		Bias:               ng.RandomBias(),
 	}
 
 	// Workaround for error:
@@ -261,7 +261,7 @@ func (c *Checkerlution) CreateOutputNeuron() *ng.Neuron {
 	// connect sensor directly to output neuron
 	for _, sensor := range c.cortex.Sensors {
 		sensor.ConnectOutbound(neuron)
-		weights := ng.FixedWeights(sensor.VectorLength, 1.0)
+		weights := ng.RandomWeights(sensor.VectorLength)
 		neuron.ConnectInboundWeighted(sensor, weights)
 	}
 
