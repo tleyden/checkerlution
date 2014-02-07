@@ -19,6 +19,7 @@ type Checkerlution struct {
 	ourTeamId            cbot.TeamType
 	cortex               *ng.Cortex
 	currentGameState     GameStateVector
+	currentBoard         core.Board
 	currentPossibleMove  ValidMoveCortexInput
 	latestActuatorOutput []float64
 	mode                 OperationMode
@@ -258,7 +259,7 @@ func (c *Checkerlution) CreateOutputNeuron() *ng.Neuron {
 	// The best fix is to just load nn from json
 	neuron.Init()
 
-	// connect sensor directly to output neuron
+	// connect sensors directly to output neuron
 	for _, sensor := range c.cortex.Sensors {
 		sensor.ConnectOutbound(neuron)
 		weights := ng.RandomWeights(sensor.VectorLength)
@@ -299,7 +300,14 @@ func (c *Checkerlution) CreateSensors() {
 		SensorFunction: c.sensorFuncGameState(),
 	}
 
-	c.cortex.SetSensors([]*ng.Sensor{sensorGameState})
+	pieceDifferentialNodeId := ng.NewSensorId("SensorPieceDifferential", sensorLayer)
+	sensorPieceDifferential := &ng.Sensor{
+		NodeId:         pieceDifferentialNodeId,
+		VectorLength:   1,
+		SensorFunction: c.sensorFuncPieceDifferential(),
+	}
+
+	c.cortex.SetSensors([]*ng.Sensor{sensorGameState, sensorPieceDifferential})
 
 }
 
@@ -309,6 +317,14 @@ func (c *Checkerlution) sensorFuncGameState() ng.SensorFunction {
 			logg.LogPanic("sensor would return invalid gamestate")
 		}
 		return c.currentGameState
+	}
+}
+
+func (c *Checkerlution) sensorFuncPieceDifferential() ng.SensorFunction {
+	return func(syncCounter int) []float64 {
+		player := cbot.GetCorePlayer(c.ourTeamId)
+		pieceDifferential := c.currentBoard.WeightedScore(player)
+		return []float64{pieceDifferential}
 	}
 }
 
@@ -351,6 +367,7 @@ func (c *Checkerlution) getEvaluationFunction(counter *int) core.EvaluationFunct
 
 		// send input to the neural net
 		c.currentGameState = gameStateVector
+		c.currentBoard = board
 		c.cortex.SyncSensors()
 		c.cortex.SyncActuators()
 
