@@ -189,7 +189,7 @@ func (c *Checkerlution) CreateHiddenLayer1Neurons(outputNeuron *ng.Neuron) []*ng
 		neuron := &ng.Neuron{
 			ActivationFunction: ng.EncodableTanh(),
 			NodeId:             ng.NewNeuronId(name, layerIndex),
-			Bias:               ng.RandomBias(),
+			Bias:               0.0,
 		}
 
 		// Workaround for error:
@@ -219,7 +219,7 @@ func (c *Checkerlution) CreateHiddenLayer2Neurons(layer1Neurons []*ng.Neuron, ou
 		neuron := &ng.Neuron{
 			ActivationFunction: ng.EncodableTanh(),
 			NodeId:             ng.NewNeuronId(name, layerIndex),
-			Bias:               ng.RandomBias(),
+			Bias:               0.0,
 		}
 
 		// Workaround for error:
@@ -250,7 +250,7 @@ func (c *Checkerlution) CreateOutputNeuron() *ng.Neuron {
 	neuron := &ng.Neuron{
 		ActivationFunction: ng.EncodableTanh(),
 		NodeId:             ng.NewNeuronId("OutputNeuron", layerIndex),
-		Bias:               ng.RandomBias(),
+		Bias:               0.0,
 	}
 
 	// Workaround for error:
