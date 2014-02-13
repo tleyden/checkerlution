@@ -136,13 +136,14 @@ func (c *Checkerlution) CreateNeurgoCortex() {
 	c.CreateSensors()
 
 	outputNeuron := c.CreateOutputNeuron()
-	layer1Neurons := c.CreateHiddenLayer1Neurons(outputNeuron)
-	layer2Neurons := c.CreateHiddenLayer2Neurons(layer1Neurons, outputNeuron)
+
+	// layer1Neurons := c.CreateHiddenLayer1Neurons(outputNeuron)
+	// layer2Neurons := c.CreateHiddenLayer2Neurons(layer1Neurons, outputNeuron)
 
 	// combine all into single slice and add neurons to cortex
 	neurons := []*ng.Neuron{}
-	neurons = append(neurons, layer1Neurons...)
-	neurons = append(neurons, layer2Neurons...)
+	// neurons = append(neurons, layer1Neurons...)
+	// neurons = append(neurons, layer2Neurons...)
 	neurons = append(neurons, outputNeuron)
 	c.cortex.SetNeurons(neurons)
 
@@ -171,8 +172,10 @@ func (c *Checkerlution) LoadNeurgoCortex(filename string) {
 
 func (c *Checkerlution) setSensorActuatorFunctions(cortex *ng.Cortex) {
 
-	sensor := cortex.FindSensor(ng.NewSensorId("SensorGameState", 0))
-	sensor.SensorFunction = c.sensorFuncGameState()
+	// DO we still need this for anything??
+
+	// sensor := cortex.FindSensor(ng.NewSensorId("SensorGameState", 0))
+	// sensor.SensorFunction = c.sensorFuncGameState()
 
 	actuator := cortex.FindActuator(ng.NewActuatorId("Actuator", 0))
 	actuator.ActuatorFunction = c.actuatorFunc()
@@ -292,13 +295,14 @@ func (c *Checkerlution) actuatorFunc() ng.ActuatorFunction {
 func (c *Checkerlution) CreateSensors() {
 
 	sensorLayer := 0.0
-
-	sensorGameStateNodeId := ng.NewSensorId("SensorGameState", sensorLayer)
-	sensorGameState := &ng.Sensor{
-		NodeId:         sensorGameStateNodeId,
-		VectorLength:   32,
-		SensorFunction: c.sensorFuncGameState(),
-	}
+	/*
+		sensorGameStateNodeId := ng.NewSensorId("SensorGameState", sensorLayer)
+		sensorGameState := &ng.Sensor{
+			NodeId:         sensorGameStateNodeId,
+			VectorLength:   32,
+			SensorFunction: c.sensorFuncGameState(),
+		}
+	*/
 
 	pieceDifferentialNodeId := ng.NewSensorId("SensorPieceDifferential", sensorLayer)
 	sensorPieceDifferential := &ng.Sensor{
@@ -307,7 +311,19 @@ func (c *Checkerlution) CreateSensors() {
 		SensorFunction: c.sensorFuncPieceDifferential(),
 	}
 
-	c.cortex.SetSensors([]*ng.Sensor{sensorGameState, sensorPieceDifferential})
+	kingsDifferentialNodeId := ng.NewSensorId("SensorKingsDifferential", sensorLayer)
+	sensorKingsDifferential := &ng.Sensor{
+		NodeId:         kingsDifferentialNodeId,
+		VectorLength:   1,
+		SensorFunction: c.sensorFuncKingsDifferential(),
+	}
+
+	sensors := []*ng.Sensor{
+		// sensorGameState,
+		sensorPieceDifferential,
+		sensorKingsDifferential,
+	}
+	c.cortex.SetSensors(sensors)
 
 }
 
@@ -323,7 +339,15 @@ func (c *Checkerlution) sensorFuncGameState() ng.SensorFunction {
 func (c *Checkerlution) sensorFuncPieceDifferential() ng.SensorFunction {
 	return func(syncCounter int) []float64 {
 		player := cbot.GetCorePlayer(c.ourTeamId)
-		pieceDifferential := c.currentBoard.WeightedScore(player)
+		pieceDifferential := c.currentBoard.WeightedScorePiecesOnly(player)
+		return []float64{pieceDifferential}
+	}
+}
+
+func (c *Checkerlution) sensorFuncKingsDifferential() ng.SensorFunction {
+	return func(syncCounter int) []float64 {
+		player := cbot.GetCorePlayer(c.ourTeamId)
+		pieceDifferential := c.currentBoard.WeightedScoreKingsOnly(player)
 		return []float64{pieceDifferential}
 	}
 }
