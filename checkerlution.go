@@ -172,10 +172,16 @@ func (c *Checkerlution) LoadNeurgoCortex(filename string) {
 
 func (c *Checkerlution) setSensorActuatorFunctions(cortex *ng.Cortex) {
 
-	// DO we still need this for anything??
+	// TODO: accomplish this in less brittle way
 
 	// sensor := cortex.FindSensor(ng.NewSensorId("SensorGameState", 0))
 	// sensor.SensorFunction = c.sensorFuncGameState()
+
+	sensorPiece := cortex.FindSensor(ng.NewSensorId("SensorPieceDifferential", 0))
+	sensorPiece.SensorFunction = c.sensorFuncPieceDifferential()
+
+	sensorKings := cortex.FindSensor(ng.NewSensorId("SensorKingsDifferential", 0))
+	sensorKings.SensorFunction = c.sensorFuncKingsDifferential()
 
 	actuator := cortex.FindActuator(ng.NewActuatorId("Actuator", 0))
 	actuator.ActuatorFunction = c.actuatorFunc()
